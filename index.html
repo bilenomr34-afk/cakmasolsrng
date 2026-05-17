@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>RNG Roll</title>
+<title>Gacha RNG System</title>
 
 <style>
 body{
@@ -10,7 +10,7 @@ body{
     color:white;
     font-family:Arial;
     text-align:center;
-    margin-top:100px;
+    margin-top:80px;
 }
 
 button{
@@ -27,8 +27,8 @@ button{
 .autoBtn{ background:#ff006a; }
 
 #result{
-    margin-top:40px;
-    font-size:45px;
+    margin-top:30px;
+    font-size:40px;
     font-weight:bold;
 }
 
@@ -41,121 +41,139 @@ button{
     text-shadow:0 0 20px red;
 }
 
-/* CUTSCENE - EN SAĞLAM FULLSCREEN */
+/* CUTSCENE */
 .cutscene{
     position:fixed;
     inset:0;
     background:black;
-    background-size:cover;
-    background-position:center;
     display:flex;
     justify-content:center;
     align-items:center;
     z-index:999;
 }
 
-.hidden{
-    display:none;
+.hidden{ display:none; }
+
+.cutscene img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
+/* INVENTORY */
+#inventory{
+    margin-top:30px;
+    padding:10px;
+    border-top:1px solid #333;
+}
 </style>
 </head>
 <body>
 
-<h1>RNG Roll</h1>
+<h1>🔥 GACHA RNG</h1>
 
 <button class="rollBtn" onclick="roll()">ROLL</button>
-<button class="autoBtn" onclick="toggleAutoRoll()">AUTO ROLL</button>
+<button class="autoBtn" onclick="toggleAuto()">AUTO</button>
 
 <div id="result">?</div>
 
+<h2>🎒 Inventory</h2>
+<div id="inventory"></div>
+
 <!-- CUTSCENE -->
-<div id="cutscene" class="cutscene hidden"></div>
+<div id="cutscene" class="cutscene hidden">
+    <img id="cutsceneGif">
+</div>
 
 <script>
 
 const items = [
-    {
-        name:"Ceyhun",
-        chance:60,
-        class:"common",
-        gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"
-    },
-    {
-        name:"Ferit",
-        chance:25,
-        class:"rare",
-        gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif"
-    },
-    {
-        name:"Pedo",
-        chance:10,
-        class:"epic",
-        gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"
-    },
-    {
-        name:"Lezbiyenler",
-        chance:4,
-        class:"legendary",
-        gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"
-    },
-    {
-        name:"Deria",
-        chance:1,
-        class:"godly",
-        gif:"https://media1.tenor.com/m/VhNHLMSVUY8AAAAd/oppression-roblox.gif"
-    }
+    {name:"Ceyhun", chance:60, class:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"},
+    {name:"Ferit", chance:25, class:"rare", gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif"},
+    {name:"Pedo", chance:10, class:"epic", gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"},
+    {name:"Lezbiyenler", chance:4, class:"legendary", gif:"https://media1.tenor.com/m/DM67oDEzHWgAAAAd/aegis-sols-rng.gif"},
+    {name:"Deria", chance:1, class:"godly", gif:"https://media1.tenor.com/m/iao77UYOTnkAAAAd/oppression-cutscene.gif"}
 ];
 
-let autoRolling = false;
-let autoRollInterval;
+let inventory = [];
+let pity = 0;
+let auto = false;
+let interval;
 
 function showCutscene(gif){
+    const c = document.getElementById("cutscene");
+    const img = document.getElementById("cutsceneGif");
 
-    const scene = document.getElementById("cutscene");
+    img.src = gif;
+    c.classList.remove("hidden");
 
-    // 🔥 background olarak GIF koyuyoruz
-    scene.style.backgroundImage = `url(${gif})`;
+    setTimeout(()=>{
+        c.classList.add("hidden");
+        img.src = "";
+    }, 1800);
+}
 
-    scene.classList.remove("hidden");
-
-    setTimeout(() => {
-        scene.classList.add("hidden");
-        scene.style.backgroundImage = "";
-    }, 2000);
+function updateInventory(){
+    const inv = document.getElementById("inventory");
+    inv.innerHTML = inventory.map(i => `<div>${i}</div>`).join("");
 }
 
 function roll(){
 
-    let random = Math.random() * 100;
-    let total = 0;
+    pity++;
+
+    // 🔥 PITY SYSTEM (50 çekimde garanti epic+)
+    const forcedEpic = pity >= 50;
+
+    let r = Math.random() * 100;
+    let sum = 0;
 
     for(let item of items){
 
-        total += item.chance;
+        sum += item.chance;
 
-        if(random <= total){
+        if(r <= sum){
 
-            const result = document.getElementById("result");
+            // pity override
+            if(forcedEpic && item.class === "common" || item.class === "rare"){
+                continue;
+            }
 
-            result.innerHTML = item.name;
-            result.className = item.class;
+            const res = document.getElementById("result");
+            res.innerHTML = item.name;
+            res.className = item.class;
+
+            inventory.push(item.name);
+            updateInventory();
 
             showCutscene(item.gif);
 
-            break;
+            pity = 0;
+
+            return;
         }
     }
+
+    // fallback
+    const last = items[items.length - 1];
+    document.getElementById("result").innerHTML = last.name;
+    document.getElementById("result").className = last.class;
+
+    inventory.push(last.name);
+    updateInventory();
+
+    showCutscene(last.gif);
+
+    pity = 0;
 }
 
-function toggleAutoRoll(){
+function toggleAuto(){
+    auto = !auto;
 
-    autoRolling = !autoRolling;
-
-    if(autoRolling){
-        autoRollInterval = setInterval(roll, 1000);
+    if(auto){
+        interval = setInterval(roll, 1200);
     }else{
-        clearInterval(autoRollInterval);
+        clearInterval(interval);
     }
 }
 
