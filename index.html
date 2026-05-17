@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Gacha RNG System</title>
+<title>Gacha RNG</title>
 
 <style>
 body{
@@ -62,15 +62,15 @@ button{
 
 /* INVENTORY */
 #inventory{
-    margin-top:30px;
-    padding:10px;
+    margin-top:20px;
     border-top:1px solid #333;
+    padding-top:10px;
 }
 </style>
 </head>
 <body>
 
-<h1>🔥 GACHA RNG</h1>
+<h1>🔥 RNG GACHA</h1>
 
 <button class="rollBtn" onclick="roll()">ROLL</button>
 <button class="autoBtn" onclick="toggleAuto()">AUTO</button>
@@ -88,10 +88,10 @@ button{
 <script>
 
 const items = [
-    {name:"Ceyhun", chance:60, class:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"},
-    {name:"Ferit", chance:25, class:"rare", gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif"},
+    {name:"Ceyhun", chance:60, class:"common", gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"},
+    {name:"Ferit", chance:25, class:"rare", gif:"https://media1.tenor.com/m/DM67oDEzHWgAAAAd/aegis-sols-rng.gif"},
     {name:"Pedo", chance:10, class:"epic", gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"},
-    {name:"Lezbiyenler", chance:4, class:"legendary", gif:"https://media1.tenor.com/m/DM67oDEzHWgAAAAd/aegis-sols-rng.gif"},
+    {name:"Lezbiyenler", chance:4, class:"legendary", gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif"},
     {name:"Deria", chance:1, class:"godly", gif:"https://media1.tenor.com/m/iao77UYOTnkAAAAd/oppression-cutscene.gif"}
 ];
 
@@ -99,31 +99,35 @@ let inventory = [];
 let pity = 0;
 let auto = false;
 let interval;
+let isCutscenePlaying = false; // 🔒 KİLİT
+
+function updateInventory(){
+    document.getElementById("inventory").innerHTML =
+        inventory.map(i => `<div>${i}</div>`).join("");
+}
 
 function showCutscene(gif){
+
+    isCutscenePlaying = true; // 🔒 kilit açıldı
+
     const c = document.getElementById("cutscene");
     const img = document.getElementById("cutsceneGif");
 
     img.src = gif;
     c.classList.remove("hidden");
 
-    setTimeout(()=>{
+    setTimeout(() => {
         c.classList.add("hidden");
         img.src = "";
+        isCutscenePlaying = false; // 🔓 kilit kapandı
     }, 1800);
-}
-
-function updateInventory(){
-    const inv = document.getElementById("inventory");
-    inv.innerHTML = inventory.map(i => `<div>${i}</div>`).join("");
 }
 
 function roll(){
 
-    pity++;
+    if(isCutscenePlaying) return; // 🔒 spam engel
 
-    // 🔥 PITY SYSTEM (50 çekimde garanti epic+)
-    const forcedEpic = pity >= 50;
+    pity++;
 
     let r = Math.random() * 100;
     let sum = 0;
@@ -133,11 +137,6 @@ function roll(){
         sum += item.chance;
 
         if(r <= sum){
-
-            // pity override
-            if(forcedEpic && item.class === "common" || item.class === "rare"){
-                continue;
-            }
 
             const res = document.getElementById("result");
             res.innerHTML = item.name;
@@ -149,7 +148,6 @@ function roll(){
             showCutscene(item.gif);
 
             pity = 0;
-
             return;
         }
     }
@@ -168,6 +166,7 @@ function roll(){
 }
 
 function toggleAuto(){
+
     auto = !auto;
 
     if(auto){
