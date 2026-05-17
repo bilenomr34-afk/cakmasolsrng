@@ -44,14 +44,12 @@ button{
 /* CUTSCENE */
 .cutscene{
     position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
+    inset:0;
     background:black;
     display:flex;
     justify-content:center;
     align-items:center;
+    overflow:hidden;
     z-index:999;
 }
 
@@ -60,8 +58,9 @@ button{
 }
 
 .cutscene img{
-    max-width:90%;
-    max-height:90%;
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
 </style>
@@ -87,31 +86,31 @@ const items = [
         name:"Ceyhun",
         chance:60,
         class:"common",
-        gif:"https://media1.tenor.com/m/VhNHLMSVUY8AAAAd/oppression-roblox.gif"
+        gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"
     },
     {
         name:"Ferit",
         chance:25,
         class:"rare",
-        gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"
+        gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif"
     },
     {
         name:"Pedo",
         chance:10,
         class:"epic",
-        gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"
+        gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"
     },
     {
         name:"Lezbiyenler",
         chance:4,
         class:"legendary",
-        gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"
+        gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"
     },
     {
         name:"Deria",
         chance:1,
         class:"godly",
-        gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif"
+        gif:"https://media1.tenor.com/m/VhNHLMSVUY8AAAAd/oppression-roblox.gif"
     }
 ];
 
