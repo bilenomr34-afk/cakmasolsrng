@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>RNG Roll</title>
+
+<style>
+body{
+    background:#111;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+    margin-top:100px;
+}
+
+button{
+    padding:15px 30px;
+    font-size:22px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    margin:10px;
+    color:white;
+}
+
+.rollBtn{
+    background:#6a00ff;
+}
+
+.autoBtn{
+    background:#ff006a;
+}
+
+#result{
+    margin-top:40px;
+    font-size:45px;
+    font-weight:bold;
+}
+
+.common{ color:gray; }
+.rare{ color:deepskyblue; }
+.epic{ color:violet; }
+.legendary{ color:gold; }
+.godly{
+    color:red;
+    text-shadow:0 0 20px red;
+}
+</style>
+</head>
+<body>
+
+<h1>RNG Roll</h1>
+
+<button class="rollBtn" onclick="roll()">
+ROLL
+</button>
+
+<button class="autoBtn" onclick="toggleAutoRoll()">
+AUTO ROLL
+</button>
+
+<div id="result">?</div>
+
+<script>
+
+const items = [
+    {name:"Ceyhun", chance:60, class:"common"},
+    {name:"Ferit", chance:25, class:"rare"},
+    {name:"Pedo", chance:10, class:"epic"},
+    {name:"Lezbiyenler", chance:4, class:"legendary"},
+    {name:"Deria", chance:1, class:"godly"}
+];
+
+let autoRolling = false;
+let autoRollInterval;
+
+function roll(){
+
+    let random = Math.random() * 100;
+    let total = 0;
+
+    for(let item of items){
+
+        total += item.chance;
+
+        if(random <= total){
+
+            const result = document.getElementById("result");
+
+            result.innerHTML = item.name;
+            result.className = item.class;
+
+            break;
+        }
+    }
+}
+
+function toggleAutoRoll(){
+
+    autoRolling = !autoRolling;
+
+    if(autoRolling){
+
+        autoRollInterval = setInterval(() => {
+            roll();
+        }, 1000);
+
+    }else{
+
+        clearInterval(autoRollInterval);
+
+    }
+}
+
+</script>
+
+</body>
+</html>
