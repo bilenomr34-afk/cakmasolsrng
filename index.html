@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>RNG Roll</title>
+<title>RNG Roll + Tenor Cutscene</title>
 
 <style>
 body{
@@ -23,13 +23,8 @@ button{
     color:white;
 }
 
-.rollBtn{
-    background:#6a00ff;
-}
-
-.autoBtn{
-    background:#ff006a;
-}
+.rollBtn{ background:#6a00ff; }
+.autoBtn{ background:#ff006a; }
 
 #result{
     margin-top:40px;
@@ -45,34 +40,116 @@ button{
     color:red;
     text-shadow:0 0 20px red;
 }
+
+/* CUTSCENE */
+.cutscene{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.9);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:999;
+}
+
+.hidden{ display:none; }
+
+.cutscene-content{
+    font-size:40px;
+    margin-bottom:20px;
+    animation: pop 0.4s ease;
+}
+
+@keyframes pop{
+    from{ transform:scale(0.5); opacity:0; }
+    to{ transform:scale(1); opacity:1; }
+}
+
+.cutscene img{
+    max-width:80%;
+    border-radius:12px;
+}
+
 </style>
 </head>
 <body>
 
 <h1>RNG Roll</h1>
 
-<button class="rollBtn" onclick="roll()">
-ROLL
-</button>
-
-<button class="autoBtn" onclick="toggleAutoRoll()">
-AUTO ROLL
-</button>
+<button class="rollBtn" onclick="roll()">ROLL</button>
+<button class="autoBtn" onclick="toggleAutoRoll()">AUTO ROLL</button>
 
 <div id="result">?</div>
+
+<!-- CUTSCENE -->
+<div id="cutscene" class="cutscene hidden">
+    <div class="cutscene-content" id="cutsceneText"></div>
+    <img id="cutsceneGif">
+</div>
 
 <script>
 
 const items = [
-    {name:"Ceyhun", chance:60, class:"common"},
-    {name:"Ferit", chance:25, class:"rare"},
-    {name:"Pedo", chance:10, class:"epic"},
-    {name:"Lezbiyenler", chance:4, class:"legendary"},
-    {name:"Deria", chance:1, class:"godly"}
+    {
+        name:"Ceyhun",
+        chance:60,
+        class:"common",
+        text:"Ceyhun ortaya çıktı!",
+        gif:"https://media.tenor.com/placeholder1.gif"
+    },
+    {
+        name:"Ferit",
+        chance:25,
+        class:"rare",
+        text:"Ferit gizemli şekilde belirdi...",
+        gif:"https://media.tenor.com/placeholder2.gif"
+    },
+    {
+        name:"Pedo",
+        chance:10,
+        class:"epic",
+        text:"Pedo sahneye epik giriş yaptı!",
+        gif:"https://media.tenor.com/placeholder3.gif"
+    },
+    {
+        name:"Lezbiyenler",
+        chance:4,
+        class:"legendary",
+        text:"Efsanevi varlıklar göründü!",
+        gif:"https://media.tenor.com/placeholder4.gif"
+    },
+    {
+        name:"Deria",
+        chance:1,
+        class:"godly",
+        text:"DERİA DÜNYAYI SİLKELEDİ!!",
+        gif:"https://tenor.com/tr/view/sovereign-sols-sols-rng-cutscene-gif-10122879554235437258"
+    }
 ];
 
 let autoRolling = false;
 let autoRollInterval;
+
+function showCutscene(text, gif){
+
+    const scene = document.getElementById("cutscene");
+    const txt = document.getElementById("cutsceneText");
+    const img = document.getElementById("cutsceneGif");
+
+    txt.innerHTML = text;
+    img.src = gif;
+
+    scene.classList.remove("hidden");
+
+    setTimeout(() => {
+        scene.classList.add("hidden");
+        img.src = "";
+    }, 2000);
+}
 
 function roll(){
 
@@ -90,6 +167,8 @@ function roll(){
             result.innerHTML = item.name;
             result.className = item.class;
 
+            showCutscene(item.text, item.gif);
+
             break;
         }
     }
@@ -100,15 +179,9 @@ function toggleAutoRoll(){
     autoRolling = !autoRolling;
 
     if(autoRolling){
-
-        autoRollInterval = setInterval(() => {
-            roll();
-        }, 1000);
-
+        autoRollInterval = setInterval(roll, 1000);
     }else{
-
         clearInterval(autoRollInterval);
-
     }
 }
 
