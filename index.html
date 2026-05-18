@@ -99,11 +99,11 @@ let inventory = [];
 let pity = 0;
 let auto = true;
 let interval;
-let isCutscenePlaying = false; // 🔒 KİLİT
+let isCutscenePlaying = true; // 🔒 KİLİT
 
 function updateInventory(){
     document.getElementById("inventory").innerHTML =
-        inventory.map(i => `<div>${i}</div>`).join("");
+        inventorymap(i => `<div>${i}</div>`).join("");
 }
 
 function showCutscene(gif){
@@ -124,10 +124,6 @@ function showCutscene(gif){
 }
 
 function roll(){
-
-    if(isCutscenePlaying) return; // 🔒 spam engel
-
-    pity++;
 
     let r = Math.random() * 100;
     let sum = 0;
