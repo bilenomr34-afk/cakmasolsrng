@@ -99,7 +99,7 @@ let inventory = [];
 let pity = 0;
 let auto = true;
 let interval;
-let isCutscenePlaying = true; // 🔒 KİLİT
+let isCutscenePlaying = false; // 🔒 KİLİT
 
 function updateInventory(){
     document.getElementById("inventory").innerHTML =
@@ -119,7 +119,7 @@ function showCutscene(gif){
     setTimeout(() => {
         c.classList.add("hidden");
         img.src = "";
-        isCutscenePlaying = false; // 🔓 kilit kapandı
+        isCutscenePlaying = true; // 🔓 kilit kapandı
     }, 1800);
 }
 
