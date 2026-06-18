@@ -136,7 +136,7 @@ function updateInventory(){
 
 function showCutscene(gif){
 
-    isCutscenePlaying = true;
+    isCutscenePlaying = false;
 
     const c = document.getElementById("cutscene");
     const img = document.getElementById("cutsceneGif");
@@ -155,7 +155,7 @@ function showCutscene(gif){
 
 function roll(){
 
-    if(isCutscenePlaying) return;
+
 
     let r = Math.random() * 100;
     let sum = 0;
