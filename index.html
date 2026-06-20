@@ -43,9 +43,15 @@ input{
 .rare{ color:deepskyblue; }
 .epic{ color:violet; }
 .legendary{ color:gold; }
+
 .godly{
     color:red;
     text-shadow:0 0 20px red;
+}
+
+.samet{
+    color:#00ff88;
+    text-shadow:0 0 25px #00ff88;
 }
 
 .cutscene{
@@ -65,7 +71,7 @@ input{
 .cutscene img{
     width:100%;
     height:100%;
-    object-fit:cover;
+    object-fit:contain;
 }
 
 #inventory{
@@ -80,8 +86,27 @@ input{
     color:lime;
     font-weight:bold;
 }
+
+/* AUTO BAR */
+#rollBarContainer{
+    width:320px;
+    height:12px;
+    background:#222;
+    border-radius:20px;
+    margin:15px auto;
+    overflow:hidden;
+    border:1px solid #444;
+}
+
+#rollBar{
+    width:0%;
+    height:100%;
+    background:rgba(255,255,255,0.6);
+    box-shadow:0 0 15px white;
+}
 </style>
 </head>
+
 <body>
 
 <h1>🔥 RNG GACHA</h1>
@@ -93,7 +118,11 @@ input{
 
 <div id="luckCounter">🍀 Luck: 0/10</div>
 
-<br><br>
+<div id="rollBarContainer">
+    <div id="rollBar"></div>
+</div>
+
+<br>
 
 <input type="password" id="codeInput" placeholder="Kod Gir">
 <button onclick="useCode()">KODU KULLAN</button>
@@ -112,31 +141,43 @@ const items = [
         name:"Cihan",
         chance:60,
         class:"common",
-        gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"
+        gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif",
+        value:1
     },
     {
         name:"Ferit",
         chance:25,
         class:"rare",
-        gif:"https://media1.tenor.com/m/DM67oDEzHWgAAAAd/aegis-sols-rng.gif"
+        gif:"https://media1.tenor.com/m/DM67oDEzHWgAAAAd/aegis-sols-rng.gif",
+        value:50
     },
     {
         name:"Pedo",
         chance:10,
         class:"epic",
-        gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"
+        gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif",
+        value:500
     },
     {
         name:"Lezbiyenler",
         chance:4,
         class:"legendary",
-        gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif"
+        gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif",
+        value:5000
     },
     {
         name:"Deria",
         chance:1,
         class:"godly",
-        gif:"https://media1.tenor.com/m/iao77UYOTnkAAAAd/oppression-cutscene.gif"
+        gif:"https://media1.tenor.com/m/iao77UYOTnkAAAAd/oppression-cutscene.gif",
+        value:50000
+    },
+    {
+        name:"Samet",
+        chance:0.0001,
+        class:"samet",
+        gif:"https://cdn.discordapp.com/attachments/1138076951320477737/1517964213727793322/WhatsApp_Image_2026-04-10_at_01.04.34.jpeg?ex=6a3831d6&is=6a36e056&hm=e80d49f9dfdcf538faf2a9c566bcd0445169a1a8d1236b76b6029584e6864a3a&",
+        value:1000000
     }
 ];
 
@@ -145,19 +186,23 @@ let auto = false;
 let interval;
 let rollCount = 0;
 let luckProgress = 0;
-let guaranteedDeria = false;
 
+let guaranteedDeria = false;
+let guaranteedSamet = false;
+
+/* INVENTORY */
 function updateInventory(){
     document.getElementById("inventory").innerHTML =
         inventory.map(i => `<div>${i}</div>`).join("");
 }
 
-function showCutscene(gif){
+/* CUTSCENE */
+function showCutscene(image){
 
     const c = document.getElementById("cutscene");
     const img = document.getElementById("cutsceneGif");
 
-    img.src = gif;
+    img.src = image;
     c.classList.remove("hidden");
 
     setTimeout(() => {
@@ -166,36 +211,77 @@ function showCutscene(gif){
     }, 1800);
 }
 
+/* CODE SYSTEM */
 function useCode(){
 
     const code = document.getElementById("codeInput").value.trim();
 
     if(code === "MALEREN31"){
-
         guaranteedDeria = true;
-
-        alert("✅ Kod kabul edildi! Sonraki roll Deria olacak.");
-
-        document.getElementById("codeInput").value = "";
-
-    }else{
-
-        alert("❌ Geçersiz kod.");
-
+        alert("🔥 Deria garantili!");
     }
+    else if(code === "İYİKİDOGDUNSAMET"){
+        guaranteedSamet = true;
+        alert("🎉 Samet garantili!");
+    }
+    else{
+        alert("❌ Geçersiz kod.");
+    }
+
+    document.getElementById("codeInput").value = "";
 }
 
+/* BAR ANIMATION */
+function startBar(callback){
+
+    let bar = document.getElementById("rollBar");
+    let w = 0;
+
+    let anim = setInterval(() => {
+
+        w += 5;
+        bar.style.width = w + "%";
+
+        if(w >= 100){
+            clearInterval(anim);
+            bar.style.width = "0%";
+            callback();
+        }
+
+    }, 25); // ~0.5s
+}
+
+/* ROLL */
 function roll(){
 
     luckProgress++;
 
-    if(luckProgress > 10){
-        luckProgress = 1;
-    }
+    if(luckProgress > 10) luckProgress = 1;
 
     document.getElementById("luckCounter").innerHTML =
         "🍀 Luck: " + luckProgress + "/10";
 
+    /* SAMET GUARANTEE */
+    if(guaranteedSamet){
+
+        guaranteedSamet = false;
+
+        const samet = items.find(i => i.name === "Samet");
+
+        const res = document.getElementById("result");
+
+        res.innerHTML = "✨ SAMET (1M AURA)";
+        res.className = samet.class;
+
+        inventory.push("Samet (1,000,000)");
+
+        updateInventory();
+        showCutscene(samet.gif);
+
+        return;
+    }
+
+    /* DERIA GUARANTEE */
     if(guaranteedDeria){
 
         guaranteedDeria = false;
@@ -204,13 +290,12 @@ function roll(){
 
         const res = document.getElementById("result");
 
-        res.innerHTML = "Deria 🔥 CODE";
+        res.innerHTML = "🔥 DERIA";
         res.className = deria.class;
 
-        inventory.push(deria.name);
+        inventory.push("Deria (50K)");
 
         updateInventory();
-
         showCutscene(deria.gif);
 
         return;
@@ -218,33 +303,19 @@ function roll(){
 
     rollCount++;
 
-    let luckMultiplier = 1;
+    let multiplier = (luckProgress === 10) ? 2 : 1;
 
-    if(luckProgress === 10){
-        luckMultiplier = 2;
-    }
+    let adjusted = items.map(i => ({
+        ...i,
+        chance: i.class !== "common" ? i.chance * multiplier : i.chance
+    }));
 
-    let adjustedItems = items.map(item => {
+    let total = adjusted.reduce((a,b)=>a+b.chance,0);
 
-        let chance = item.chance;
-
-        if(item.class !== "common"){
-            chance *= luckMultiplier;
-        }
-
-        return {
-            ...item,
-            chance
-        };
-    });
-
-    const totalChance =
-        adjustedItems.reduce((sum, item) => sum + item.chance, 0);
-
-    let r = Math.random() * totalChance;
+    let r = Math.random() * total;
     let sum = 0;
 
-    for(let item of adjustedItems){
+    for(let item of adjusted){
 
         sum += item.chance;
 
@@ -261,10 +332,9 @@ function roll(){
             res.innerHTML = text;
             res.className = item.class;
 
-            inventory.push(item.name);
+            inventory.push(item.name + " (" + item.value + ")");
 
             updateInventory();
-
             showCutscene(item.gif);
 
             return;
@@ -272,11 +342,16 @@ function roll(){
     }
 }
 
+/* AUTO TOGGLE */
 function toggleAuto(){
 
     auto = !auto;
 
+    const btn = document.querySelector(".autoBtn");
+
     if(auto){
+
+        btn.innerText = "AUTO ON";
 
         interval = setInterval(() => {
 
@@ -285,15 +360,18 @@ function toggleAuto(){
                 .classList.contains("hidden");
 
             if(!cutsceneOpen){
-                roll();
+                startBar(() => roll());
             }
 
-        }, 2000);
+        }, 500);
 
     }else{
 
+        btn.innerText = "AUTO";
+
         clearInterval(interval);
 
+        document.getElementById("rollBar").style.width = "0%";
     }
 }
 
