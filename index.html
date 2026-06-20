@@ -197,7 +197,144 @@ function toggleAuto(){
     }
 }
 
-</script>
+<script>
 
-</body>
-</html>
+const items = [
+    {
+        name:"Cihan",
+        chance:60,
+        class:"common",
+        gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"
+    },
+    {
+        name:"Ferit",
+        chance:25,
+        class:"rare",
+        gif:"https://media1.tenor.com/m/DM67oDEzHWgAAAAd/aegis-sols-rng.gif"
+    },
+    {
+        name:"Pedo",
+        chance:10,
+        class:"epic",
+        gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"
+    },
+    {
+        name:"Lezbiyenler",
+        chance:4,
+        class:"legendary",
+        gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif"
+    },
+    {
+        name:"Deria",
+        chance:1,
+        class:"godly",
+        gif:"https://media1.tenor.com/m/iao77UYOTnkAAAAd/oppression-cutscene.gif"
+    }
+];
+
+let inventory = [];
+let auto = false;
+let interval;
+let rollCount = 0;
+
+function updateInventory(){
+    document.getElementById("inventory").innerHTML =
+        inventory.map(i => `<div>${i}</div>`).join("");
+}
+
+function showCutscene(gif){
+
+    const c = document.getElementById("cutscene");
+    const img = document.getElementById("cutsceneGif");
+
+    img.src = gif;
+    c.classList.remove("hidden");
+
+    setTimeout(() => {
+        c.classList.add("hidden");
+        img.src = "";
+    }, 1800);
+}
+
+function roll(){
+
+    rollCount++;
+
+    let luckMultiplier = 1;
+
+    if(rollCount % 10 === 0){
+        luckMultiplier = 2;
+    }
+
+    let adjustedItems = items.map(item => {
+
+        let chance = item.chance;
+
+        if(item.class !== "common"){
+            chance *= luckMultiplier;
+        }
+
+        return {
+            ...item,
+            chance
+        };
+    });
+
+    const totalChance =
+        adjustedItems.reduce((sum, item) => sum + item.chance, 0);
+
+    let r = Math.random() * totalChance;
+    let sum = 0;
+
+    for(let item of adjustedItems){
+
+        sum += item.chance;
+
+        if(r <= sum){
+
+            const res = document.getElementById("result");
+
+            res.innerHTML =
+                item.name +
+                (rollCount % 10 === 0 ? " 🍀 2x LUCK" : "");
+
+            res.className = item.class;
+
+            inventory.push(item.name);
+
+            updateInventory();
+
+            showCutscene(item.gif);
+
+            return;
+        }
+    }
+}
+
+function toggleAuto(){
+
+    auto = !auto;
+
+    if(auto){
+
+        interval = setInterval(() => {
+
+            const cutsceneOpen =
+                !document
+                .getElementById("cutscene")
+                .classList.contains("hidden");
+
+            if(!cutsceneOpen){
+                roll();
+            }
+
+        }, 2000);
+
+    }else{
+
+        clearInterval(interval);
+
+    }
+}
+
+</script>
