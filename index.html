@@ -19,16 +19,17 @@ body.aura{
     background:black;
 }
 
-/* SIDE LIGHTS */
+/* SIDE BREATH LIGHTS */
 .sideLight{
     position:fixed;
     top:0;
-    width:120px;
+    width:140px;
     height:100vh;
     opacity:0;
-    filter:blur(40px);
+    filter:blur(50px);
     animation:breath 2s infinite ease-in-out;
     pointer-events:none;
+    z-index:1;
 }
 
 #leftLight{left:0;}
@@ -36,7 +37,7 @@ body.aura{
 
 @keyframes breath{
     0%{opacity:0.1; transform:scaleX(1);}
-    50%{opacity:0.8; transform:scaleX(1.4);}
+    50%{opacity:0.9; transform:scaleX(1.5);}
     100%{opacity:0.1; transform:scaleX(1);}
 }
 
@@ -92,6 +93,7 @@ button{
     background:white;
     opacity:0;
     pointer-events:none;
+    z-index:5;
 }
 
 #star{
@@ -103,7 +105,7 @@ button{
     clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
     transform:translate(-50%,-50%) scale(0.2);
     opacity:0;
-    transition:0.2s;
+    z-index:6;
 }
 </style>
 </head>
@@ -145,6 +147,7 @@ const items=[
 let inv=[];
 let auto=false;
 let loop;
+let luck=0;
 let lock=false;
 
 /* INVENTORY */
@@ -160,7 +163,7 @@ let flash=document.getElementById("flash");
 
 document.body.classList.add("aura");
 
-/* side lights color */
+/* side lights */
 document.getElementById("leftLight").style.background=item.color;
 document.getElementById("rightLight").style.background=item.color;
 document.getElementById("leftLight").style.opacity="1";
@@ -181,6 +184,8 @@ rot+=10;
 
 star.style.transform=`translate(-50%,-50%) scale(${scale}) rotate(${rot}deg)`;
 
+document.body.style.transform="translate(2px,2px)";
+
 if(scale>2.5){
 
 clearInterval(anim);
@@ -193,6 +198,7 @@ flash.style.opacity=0;
 star.style.opacity=0;
 
 document.body.classList.remove("aura");
+document.body.style.transform="none";
 
 document.getElementById("leftLight").style.opacity="0";
 document.getElementById("rightLight").style.opacity="0";
@@ -200,7 +206,7 @@ document.getElementById("rightLight").style.opacity="0";
 document.getElementById("result").innerText=item.name;
 document.getElementById("result").className=item.class;
 
-},250);
+},200);
 
 }
 
