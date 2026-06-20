@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>RNG FIXED</title>
+<title>RNG SYSTEM</title>
 
 <style>
 body{
@@ -11,34 +11,11 @@ body{
     color:white;
     font-family:Arial;
     text-align:center;
-    overflow:hidden;
-    transition:0.5s;
+    transition:0.1s;
 }
 
-body.aura{
-    background:black;
-}
-
-/* SIDE BREATH LIGHTS */
-.sideLight{
-    position:fixed;
-    top:0;
-    width:140px;
-    height:100vh;
-    opacity:0;
-    filter:blur(50px);
-    animation:breath 2s infinite ease-in-out;
-    pointer-events:none;
-    z-index:1;
-}
-
-#leftLight{left:0;}
-#rightLight{right:0;}
-
-@keyframes breath{
-    0%{opacity:0.1; transform:scaleX(1);}
-    50%{opacity:0.9; transform:scaleX(1.5);}
-    100%{opacity:0.1; transform:scaleX(1);}
+h1{
+    margin-top:20px;
 }
 
 .card{
@@ -47,75 +24,108 @@ body.aura{
     padding:20px;
     background:rgba(255,255,255,0.05);
     border-radius:15px;
-    position:relative;
-    z-index:2;
+    border:1px solid rgba(255,255,255,0.1);
 }
 
 button{
-    padding:10px 15px;
-    margin:5px;
+    padding:12px 20px;
     border:none;
-    border-radius:8px;
+    border-radius:10px;
     cursor:pointer;
     color:white;
+    margin:5px;
 }
 
 .rollBtn{ background:#6a00ff; }
 .autoBtn{ background:#ff006a; }
 
 #result{
-    font-size:30px;
-    margin:10px;
+    font-size:32px;
+    margin:15px 0;
 }
 
-.common{color:#aaa;}
-.rare{color:#00c3ff;}
-.epic{color:#b84dff;}
-.legendary{color:#ffd700;}
-.godly{color:#ff0033;}
-.samet{color:#00ff99;}
+.common{ color:#aaa; }
+.rare{ color:#00c3ff; }
+.epic{ color:#b84dff; }
+.legendary{ color:#ffd700; }
+.godly{ color:#ff0033; }
+.samet{ color:#00ff99; }
 
+#luckCounter{
+    color:#00ff99;
+}
+
+/* BAR */
 #bar{
     width:100%;
     height:10px;
     background:#222;
+    border-radius:10px;
+    overflow:hidden;
 }
 
 #fill{
-    height:100%;
     width:0%;
+    height:100%;
     background:white;
 }
 
+/* INVENTORY */
+#inv{
+    margin-top:10px;
+    font-size:14px;
+}
+
+/* CUTSCENE SAMET */
+.cutscene{
+    position:fixed;
+    inset:0;
+    background:black;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+
+.hidden{ display:none; }
+
+.cutscene img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+/* ⭐ EFFECT STAR */
+#effectStar{
+    position:fixed;
+    top:50%;
+    left:50%;
+    width:80px;
+    height:80px;
+    background:conic-gradient(red,yellow,green,cyan,blue,magenta,red);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 
+                       68% 57%, 79% 91%, 50% 70%, 
+                       21% 91%, 32% 57%, 2% 35%, 
+                       39% 35%);
+    transform:translate(-50%,-50%) scale(0.2);
+    opacity:0;
+    z-index:9999;
+}
+
+/* ⚪ FLASH */
 #flash{
     position:fixed;
     inset:0;
     background:white;
     opacity:0;
-    pointer-events:none;
-    z-index:5;
-}
-
-#star{
-    position:fixed;
-    top:50%;
-    left:50%;
-    width:70px;
-    height:70px;
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-    transform:translate(-50%,-50%) scale(0.2);
-    opacity:0;
-    z-index:6;
+    z-index:10000;
 }
 </style>
 </head>
 
 <body>
 
-<div id="leftLight" class="sideLight"></div>
-<div id="rightLight" class="sideLight"></div>
-
-<h1>RNG SYSTEM</h1>
+<h1>🔥 RNG SYSTEM</h1>
 
 <div class="card">
 
@@ -123,70 +133,101 @@ button{
 <button class="autoBtn" onclick="toggleAuto()">AUTO</button>
 
 <div id="result">?</div>
+<div id="luckCounter">🍀 0/10</div>
 
 <div id="bar"><div id="fill"></div></div>
+
+<input id="code" placeholder="Kod">
+<button onclick="useCode()">KOD</button>
 
 <div id="inv"></div>
 
 </div>
 
+<div id="cut" class="cutscene hidden">
+<img id="cutimg">
+</div>
+
+<div id="effectStar"></div>
 <div id="flash"></div>
-<div id="star"></div>
 
 <script>
 
 const items=[
-{name:"Cihan",chance:60,class:"common",color:"#aaa"},
-{name:"Ferit",chance:25,class:"rare",color:"#00c3ff"},
-{name:"Pedo",chance:10,class:"epic",color:"#b84dff"},
-{name:"Lezbi",chance:4,class:"legendary",color:"#ffd700"},
-{name:"Deria",chance:1,class:"godly",color:"#ff0033"},
-{name:"Samet",chance:0.0001,class:"samet",color:"#00ff99"}
+{name:"Cihan",chance:60,class:"common"},
+{name:"Ferit",chance:25,class:"rare"},
+{name:"Pedo",chance:10,class:"epic"},
+{name:"Lezbi",chance:4,class:"legendary"},
+{name:"Deria",chance:1,class:"godly"},
+{name:"Samet",chance:0.0001,class:"samet"}
 ];
 
 let inv=[];
 let auto=false;
 let loop;
 let luck=0;
-let lock=false;
+
+let deriaNext=false;
+let sametNext=false;
 
 /* INVENTORY */
 function updateInv(){
 document.getElementById("inv").innerHTML=inv.join("<br>");
 }
 
-/* EFFECT */
-function effect(item){
+/* SAMET CUTSCENE */
+function cut(img){
+let c=document.getElementById("cut");
+let i=document.getElementById("cutimg");
+i.src=img;
+c.classList.remove("hidden");
 
-let star=document.getElementById("star");
+setTimeout(()=>{
+c.classList.add("hidden");
+i.src="";
+},1800);
+}
+
+/* CODE */
+function useCode(){
+let c=document.getElementById("code").value.trim();
+
+if(c==="MALEREN31") deriaNext=true;
+else if(c==="İYİKİDOGDUNSAMET") sametNext=true;
+else alert("wrong");
+
+document.getElementById("code").value="";
+}
+
+/* SHAKE */
+function shake(){
+document.body.style.transform="translate(4px,4px)";
+setTimeout(()=>document.body.style.transform="translate(-4px,0)",40);
+setTimeout(()=>document.body.style.transform="translate(0,0)",80);
+}
+
+/* ⭐ AURA EFFECT */
+function aura(item){
+
+let star=document.getElementById("effectStar");
 let flash=document.getElementById("flash");
 
-document.body.classList.add("aura");
-
-/* side lights */
-document.getElementById("leftLight").style.background=item.color;
-document.getElementById("rightLight").style.background=item.color;
-document.getElementById("leftLight").style.opacity="1";
-document.getElementById("rightLight").style.opacity="1";
-
-/* star color */
-star.style.background=item.color;
-
-let scale=0.2;
+let s=0.2;
 let rot=0;
 
 star.style.opacity=1;
 
 let anim=setInterval(()=>{
 
-scale+=0.05;
+s+=0.05;
 rot+=10;
 
-star.style.transform=`translate(-50%,-50%) scale(${scale}) rotate(${rot}deg)`;
+star.style.transform=
+`translate(-50%,-50%) scale(${s}) rotate(${rot}deg)`;
 
-document.body.style.transform="translate(2px,2px)";
+shake();
 
-if(scale>2.5){
+if(s>=3){
 
 clearInterval(anim);
 
@@ -197,13 +238,9 @@ setTimeout(()=>{
 flash.style.opacity=0;
 star.style.opacity=0;
 
-document.body.classList.remove("aura");
-document.body.style.transform="none";
+document.getElementById("result").innerText=
+"✨ "+item.name.toUpperCase()+" ✨";
 
-document.getElementById("leftLight").style.opacity="0";
-document.getElementById("rightLight").style.opacity="0";
-
-document.getElementById("result").innerText=item.name;
 document.getElementById("result").className=item.class;
 
 },200);
@@ -215,50 +252,81 @@ document.getElementById("result").className=item.class;
 
 /* BAR */
 function bar(cb){
-
-if(lock) return;
-lock=true;
-
 let f=document.getElementById("fill");
 let w=0;
 
 let t=setInterval(()=>{
 
-w+=5;
+w+=6;
 f.style.width=w+"%";
 
 if(w>=100){
 clearInterval(t);
 f.style.width="0%";
-lock=false;
 cb();
 }
 
-},20);
+},25);
 }
 
 /* ROLL */
 function roll(){
 
-if(lock) return;
+luck++;
+if(luck>10) luck=1;
 
-let r=Math.random()*100;
-let sum=0;
+document.getElementById("luckCounter").innerText="🍀 "+luck+"/10";
 
-for(let i of items){
-
-sum+=i.chance;
-
-if(r<=sum){
-
-effect(i);
-inv.push(i.name);
+/* GUARANTEES */
+if(sametNext){
+sametNext=false;
+let s=items.find(i=>i.name==="Samet");
+cut(s.gif);
+inv.push("Samet");
 updateInv();
 return;
 }
 
+if(deriaNext){
+deriaNext=false;
+let d=items.find(i=>i.name==="Deria");
+document.getElementById("result").innerText="DERIA";
+inv.push("Deria");
+updateInv();
+cut(d.gif);
+return;
 }
 
+let multi=(luck===10)?2:1;
+
+let pool=items.map(i=>({
+...i,
+chance:i.class!=="common"?i.chance*multi:i.chance
+}));
+
+let total=pool.reduce((a,b)=>a+b.chance,0);
+let r=Math.random()*total;
+let s=0;
+
+for(let i of pool){
+
+s+=i.chance;
+
+if(r<=s){
+
+if(i.name==="Samet"){
+cut(i.gif);
+}else{
+aura(i);
+}
+
+inv.push(i.name);
+updateInv();
+
+return;
+}
+
+}
 }
 
 /* AUTO */
@@ -270,9 +338,11 @@ if(auto){
 
 loop=setInterval(()=>{
 
+if(document.getElementById("cut").classList.contains("hidden")){
 bar(()=>roll());
+}
 
-},600);
+},500);
 
 }else{
 clearInterval(loop);
