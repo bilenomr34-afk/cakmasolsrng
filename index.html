@@ -14,9 +14,7 @@ body{
     transition:0.1s;
 }
 
-h1{
-    margin-top:20px;
-}
+h1{ margin-top:20px; }
 
 .card{
     width:420px;
@@ -76,7 +74,7 @@ button{
     font-size:14px;
 }
 
-/* CUTSCENE SAMET */
+/* CUTSCENE */
 .cutscene{
     position:fixed;
     inset:0;
@@ -95,7 +93,7 @@ button{
     object-fit:contain;
 }
 
-/* ⭐ EFFECT STAR */
+/* STAR */
 #effectStar{
     position:fixed;
     top:50%;
@@ -112,7 +110,7 @@ button{
     z-index:9999;
 }
 
-/* ⚪ FLASH */
+/* FLASH */
 #flash{
     position:fixed;
     inset:0;
@@ -154,31 +152,34 @@ button{
 <script>
 
 const items=[
-{name:"Cihan",chance:60,class:"common"},
-{name:"Ferit",chance:25,class:"rare"},
-{name:"Pedo",chance:10,class:"epic"},
-{name:"Lezbi",chance:4,class:"legendary"},
-{name:"Deria",chance:1,class:"godly"},
-{name:"Samet",chance:0.0001,class:"samet"}
+{name:"Cihan",chance:60,class:"common",gif:""},
+{name:"Ferit",chance:25,class:"rare",gif:""},
+{name:"Pedo",chance:10,class:"epic",gif:""},
+{name:"Lezbi",chance:4,class:"legendary",gif:""},
+{name:"Deria",chance:1,class:"godly",gif:""},
+{name:"Samet",chance:0.0001,class:"samet",gif:""}
 ];
 
 let inv=[];
 let auto=false;
 let loop;
 let luck=0;
-
 let deriaNext=false;
 let sametNext=false;
+let lock=false;
 
 /* INVENTORY */
 function updateInv(){
 document.getElementById("inv").innerHTML=inv.join("<br>");
 }
 
-/* SAMET CUTSCENE */
+/* CUTSCENE SAFE */
 function cut(img){
+if(!img) return;
+
 let c=document.getElementById("cut");
 let i=document.getElementById("cutimg");
+
 i.src=img;
 c.classList.remove("hidden");
 
@@ -201,12 +202,12 @@ document.getElementById("code").value="";
 
 /* SHAKE */
 function shake(){
-document.body.style.transform="translate(4px,4px)";
-setTimeout(()=>document.body.style.transform="translate(-4px,0)",40);
+document.body.style.transform="translate(3px,3px)";
+setTimeout(()=>document.body.style.transform="translate(-3px,0)",40);
 setTimeout(()=>document.body.style.transform="translate(0,0)",80);
 }
 
-/* ⭐ AURA EFFECT */
+/* AURA */
 function aura(item){
 
 let star=document.getElementById("effectStar");
@@ -252,6 +253,10 @@ document.getElementById("result").className=item.class;
 
 /* BAR */
 function bar(cb){
+
+if(lock) return;
+lock=true;
+
 let f=document.getElementById("fill");
 let w=0;
 
@@ -263,6 +268,7 @@ f.style.width=w+"%";
 if(w>=100){
 clearInterval(t);
 f.style.width="0%";
+lock=false;
 cb();
 }
 
@@ -271,6 +277,8 @@ cb();
 
 /* ROLL */
 function roll(){
+
+if(lock) return;
 
 luck++;
 if(luck>10) luck=1;
@@ -290,10 +298,9 @@ return;
 if(deriaNext){
 deriaNext=false;
 let d=items.find(i=>i.name==="Deria");
-document.getElementById("result").innerText="DERIA";
+cut(d.gif);
 inv.push("Deria");
 updateInv();
-cut(d.gif);
 return;
 }
 
@@ -306,23 +313,22 @@ chance:i.class!=="common"?i.chance*multi:i.chance
 
 let total=pool.reduce((a,b)=>a+b.chance,0);
 let r=Math.random()*total;
-let s=0;
+let sum=0;
 
 for(let i of pool){
 
-s+=i.chance;
+sum+=i.chance;
 
-if(r<=s){
+if(r<=sum){
 
 if(i.name==="Samet"){
 cut(i.gif);
-}else{
-aura(i);
 }
+
+aura(i);
 
 inv.push(i.name);
 updateInv();
-
 return;
 }
 
@@ -338,9 +344,10 @@ if(auto){
 
 loop=setInterval(()=>{
 
-if(document.getElementById("cut").classList.contains("hidden")){
+if(!document.getElementById("cut").classList.contains("hidden")) return;
+if(lock) return;
+
 bar(()=>roll());
-}
 
 },500);
 
