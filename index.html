@@ -5,114 +5,78 @@
 <title>Gacha RNG</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap');
-
 body{
     margin:0;
-    background: radial-gradient(circle at top, #1a1a2e, #0f0f0f);
+    background:#0b0b0f;
     color:white;
-    font-family:Orbitron, Arial;
+    font-family:Arial;
     text-align:center;
 }
 
-/* HEADER */
 h1{
-    margin-top:30px;
-    font-size:34px;
-    text-shadow:0 0 20px #6a00ff;
+    margin-top:20px;
+    text-shadow:0 0 15px #6a00ff;
 }
 
-/* MAIN CARD */
 .card{
     width:420px;
-    margin:30px auto;
+    margin:20px auto;
     padding:20px;
     background:rgba(255,255,255,0.05);
+    border-radius:15px;
     border:1px solid rgba(255,255,255,0.1);
-    border-radius:20px;
-    backdrop-filter:blur(10px);
-    box-shadow:0 0 30px rgba(106,0,255,0.3);
 }
 
-/* BUTTONS */
 button{
-    padding:12px 25px;
-    font-size:18px;
+    padding:12px 20px;
     border:none;
-    border-radius:12px;
+    border-radius:10px;
     cursor:pointer;
-    margin:8px;
     color:white;
-    transition:0.2s;
+    margin:5px;
 }
 
-button:hover{
-    transform:scale(1.05);
-    box-shadow:0 0 15px white;
-}
+.rollBtn{ background:#6a00ff; }
+.autoBtn{ background:#ff006a; }
 
-.rollBtn{ background:linear-gradient(45deg,#6a00ff,#b300ff); }
-.autoBtn{ background:linear-gradient(45deg,#ff006a,#ff4d4d); }
-
-/* RESULT */
 #result{
-    margin-top:20px;
-    font-size:38px;
-    font-weight:bold;
-    text-shadow:0 0 15px white;
+    font-size:32px;
+    margin:15px 0;
 }
 
-/* RARITIES */
 .common{ color:#aaa; }
-.rare{ color:#00d4ff; text-shadow:0 0 10px #00d4ff; }
-.epic{ color:#b84dff; text-shadow:0 0 10px #b84dff; }
-.legendary{ color:#ffd700; text-shadow:0 0 15px #ffd700; }
-.godly{ color:#ff0033; text-shadow:0 0 25px red; }
-.samet{ color:#00ff99; text-shadow:0 0 25px #00ff99; }
+.rare{ color:#00c3ff; }
+.epic{ color:#b84dff; }
+.legendary{ color:#ffd700; }
+.godly{ color:#ff0033; }
+.samet{ color:#00ff99; }
 
-/* LUCK */
 #luckCounter{
-    margin-top:10px;
-    font-size:18px;
     color:#00ff99;
+    margin-bottom:10px;
 }
 
-/* BAR */
-#rollBarContainer{
+#bar{
     width:100%;
     height:10px;
     background:#222;
-    border-radius:20px;
+    border-radius:10px;
     overflow:hidden;
-    margin-top:15px;
 }
 
-#rollBar{
+#fill{
     width:0%;
     height:100%;
-    background:linear-gradient(90deg,#fff,#6a00ff);
-    box-shadow:0 0 10px white;
+    background:white;
 }
 
-/* INVENTORY */
-#inventory{
-    margin-top:15px;
-    padding-top:10px;
-    border-top:1px solid rgba(255,255,255,0.1);
-    max-height:120px;
-    overflow:auto;
-    font-size:14px;
-}
-
-/* CUTSCENE */
 .cutscene{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,0.9);
+    background:black;
     display:flex;
     justify-content:center;
     align-items:center;
-    z-index:999;
 }
 
 .hidden{ display:none; }
@@ -123,181 +87,171 @@ button:hover{
     object-fit:contain;
 }
 
-/* INPUT */
 input{
     padding:10px;
     border-radius:10px;
     border:none;
     width:60%;
-    margin-top:10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🔥 RNG GACHA SYSTEM</h1>
+<h1>🔥 RNG</h1>
 
 <div class="card">
 
-    <button class="rollBtn" onclick="roll()">ROLL</button>
-    <button class="autoBtn" onclick="toggleAuto()">AUTO</button>
+<button class="rollBtn" onclick="roll()">ROLL</button>
+<button class="autoBtn" onclick="toggleAuto()">AUTO</button>
 
-    <div id="result">?</div>
+<div id="result">?</div>
+<div id="luckCounter">🍀 0/10</div>
 
-    <div id="luckCounter">🍀 Luck: 0/10</div>
+<div id="bar"><div id="fill"></div></div>
 
-    <div id="rollBarContainer">
-        <div id="rollBar"></div>
-    </div>
+<br>
 
-    <input type="password" id="codeInput" placeholder="Kod Gir">
-    <button onclick="useCode()">KOD</button>
+<input id="code" placeholder="Kod">
+<button onclick="useCode()">OK</button>
 
-    <div id="inventory"></div>
+<div id="inv"></div>
 
 </div>
 
-<div id="cutscene" class="cutscene hidden">
-    <img id="cutsceneGif">
+<div id="cut" class="cutscene hidden">
+<img id="cutimg">
 </div>
 
 <script>
 
-const items = [
-    {name:"Cihan",chance:60,class:"common",gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif",value:1},
-    {name:"Ferit",chance:25,class:"rare",gif:"https://media1.tenor.com/m/DM67oDEzHWgAAAAd/aegis-sols-rng.gif",value:50},
-    {name:"Pedo",chance:10,class:"epic",gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif",value:500},
-    {name:"Lezbiyenler",chance:4,class:"legendary",gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif",value:5000},
-    {name:"Deria",chance:1,class:"godly",gif:"https://media1.tenor.com/m/iao77UYOTnkAAAAd/oppression-cutscene.gif",value:50000},
-    {name:"Samet",chance:0.0001,class:"samet",https://cdn.discordapp.com/attachments/1138076951320477737/1517964213727793322/WhatsApp_Image_2026-04-10_at_01.04.34.jpeg?ex=6a3831d6&is=6a36e056&hm=e80d49f9dfdcf538faf2a9c566bcd0445169a1a8d1236b76b6029584e6864a3a&:"samet.png",value:1000000}
+const items=[
+{name:"Cihan",chance:60,class:"common",gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"},
+{name:"Ferit",chance:25,class:"rare",gif:"https://media1.tenor.com/m/DM67oDEzHWgAAAAd/aegis-sols-rng.gif"},
+{name:"Pedo",chance:10,class:"epic",gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"},
+{name:"Lezbi",chance:4,class:"legendary",gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif"},
+{name:"Deria",chance:1,class:"godly",gif:"https://media1.tenor.com/m/iao77UYOTnkAAAAd/oppression-cutscene.gif"},
+{name:"Samet",chance:0.0001,class:"samet",gif:"https://cdn.discordapp.com/attachments/1138076951320477737/1517964213727793322/WhatsApp_Image_2026-04-10_at_01.04.34.jpeg?ex=6a3831d6&is=6a36e056&hm=e80d49f9dfdcf538faf2a9c566bcd0445169a1a8d1236b76b6029584e6864a3a&"}
 ];
 
-let inventory=[];
+let inv=[];
 let auto=false;
-let interval;
-let luckProgress=0;
-let guaranteedSamet=false;
-let guaranteedDeria=false;
+let loop;
+let luck=0;
+let lock=false;
 
-function updateInventory(){
-    document.getElementById("inventory").innerHTML =
-        inventory.map(i=>`• ${i}`).join("<br>");
+let deriaNext=false;
+let sametNext=false;
+
+function updateInv(){
+document.getElementById("inv").innerHTML=inv.join("<br>");
 }
 
-function showCutscene(img){
-    const c=document.getElementById("cutscene");
-    const i=document.getElementById("cutsceneGif");
-    i.src=img;
-    c.classList.remove("hidden");
-    setTimeout(()=>{c.classList.add("hidden");i.src="";},1500);
+function cut(img){
+let c=document.getElementById("cut");
+let i=document.getElementById("cutimg");
+i.src=img;
+c.classList.remove("hidden");
+setTimeout(()=>{c.classList.add("hidden");i.src=""},1500);
 }
 
 function useCode(){
+let c=document.getElementById("code").value.trim();
 
-    let code=document.getElementById("codeInput").value.trim();
+if(c==="MALEREN31") deriaNext=true;
+else if(c==="İYİKİDOGDUNSAMET") sametNext=true;
+else alert("wrong");
 
-    if(code==="MALEREN31") guaranteedDeria=true;
-    else if(code==="İYİKİDOGDUNSAMET") guaranteedSamet=true;
-    else alert("Hatalı kod");
-
-    document.getElementById("codeInput").value="";
+document.getElementById("code").value="";
 }
 
-function startBar(cb){
+function bar(cb){
+if(lock) return;
+lock=true;
 
-    let bar=document.getElementById("rollBar");
-    let w=0;
+let f=document.getElementById("fill");
+let w=0;
 
-    let t=setInterval(()=>{
+let t=setInterval(()=>{
+w+=6;
+f.style.width=w+"%";
 
-        w+=5;
-        bar.style.width=w+"%";
-
-        if(w>=100){
-            clearInterval(t);
-            bar.style.width="0%";
-            cb();
-        }
-
-    },25);
+if(w>=100){
+clearInterval(t);
+f.style.width="0%";
+lock=false;
+cb();
+}
+},30);
 }
 
 function roll(){
 
-    luckProgress++;
-    if(luckProgress>10) luckProgress=1;
+if(lock) return;
 
-    document.getElementById("luckCounter").innerText =
-        "🍀 Luck: "+luckProgress+"/10";
+luck++;
+if(luck>10) luck=1;
 
-    if(guaranteedSamet){
-        guaranteedSamet=false;
-        let s=items.find(i=>i.name==="Samet");
-        document.getElementById("result").innerText="SAMET ✨";
-        inventory.push("Samet 1M");
-        updateInventory();
-        showCutscene(s.gif);
-        return;
-    }
+document.getElementById("luckCounter").innerText="🍀 "+luck+"/10";
 
-    if(guaranteedDeria){
-        guaranteedDeria=false;
-        let d=items.find(i=>i.name==="Deria");
-        document.getElementById("result").innerText="DERIA 🔥";
-        inventory.push("Deria");
-        updateInventory();
-        showCutscene(d.gif);
-        return;
-    }
+if(sametNext){
+sametNext=false;
+let s=items.find(i=>i.name==="Samet");
+document.getElementById("result").innerText="SAMET";
+inv.push("Samet");
+updateInv();
+cut(s.gif);
+return;
+}
 
-    let multi=(luckProgress===10)?2:1;
+if(deriaNext){
+deriaNext=false;
+let d=items.find(i=>i.name==="Deria");
+document.getElementById("result").innerText="DERIA";
+inv.push("Deria");
+updateInv();
+cut(d.gif);
+return;
+}
 
-    let pool=items.map(i=>({...i,chance:i.class!=="common"?i.chance*multi:i.chance}));
+let multi=(luck===10)?2:1;
 
-    let total=pool.reduce((a,b)=>a+b.chance,0);
+let pool=items.map(i=>({
+...i,
+chance:i.class!=="common"?i.chance*multi:i.chance
+}));
 
-    let r=Math.random()*total;
-    let sum=0;
+let total=pool.reduce((a,b)=>a+b.chance,0);
+let r=Math.random()*total;
+let s=0;
 
-    for(let i of pool){
+for(let i of pool){
+s+=i.chance;
+if(r<=s){
 
-        sum+=i.chance;
+document.getElementById("result").innerText=i.name;
+document.getElementById("result").className=i.class;
 
-        if(r<=sum){
+inv.push(i.name);
+updateInv();
+cut(i.gif);
 
-            document.getElementById("result").innerText=i.name;
-            document.getElementById("result").className=i.class;
-
-            inventory.push(i.name);
-            updateInventory();
-            showCutscene(i.gif);
-
-            return;
-        }
-    }
+return;
+}
+}
 }
 
 function toggleAuto(){
+auto=!auto;
 
-    auto=!auto;
-
-    if(auto){
-
-        interval=setInterval(()=>{
-
-            let cut=!document.getElementById("cutscene").classList.contains("hidden");
-
-            if(!cut){
-                startBar(()=>roll());
-            }
-
-        },500);
-
-    }else{
-        clearInterval(interval);
-        document.getElementById("rollBar").style.width="0%";
-    }
+if(auto){
+loop=setInterval(()=>{
+let c=document.getElementById("cut").classList.contains("hidden");
+if(c) bar(()=>roll());
+},600);
+}else{
+clearInterval(loop);
+}
 }
 
 </script>
