@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>RNG SYSTEM</title>
+<title>RNG FIXED</title>
 
 <style>
 body{
@@ -11,11 +11,6 @@ body{
     color:white;
     font-family:Arial;
     text-align:center;
-    transition:0.1s;
-}
-
-h1{
-    margin-top:20px;
 }
 
 .card{
@@ -24,108 +19,69 @@ h1{
     padding:20px;
     background:rgba(255,255,255,0.05);
     border-radius:15px;
-    border:1px solid rgba(255,255,255,0.1);
 }
 
 button{
-    padding:12px 20px;
+    padding:10px 15px;
+    margin:5px;
     border:none;
-    border-radius:10px;
+    border-radius:8px;
     cursor:pointer;
     color:white;
-    margin:5px;
 }
 
 .rollBtn{ background:#6a00ff; }
 .autoBtn{ background:#ff006a; }
 
 #result{
-    font-size:32px;
-    margin:15px 0;
+    font-size:30px;
+    margin:10px;
 }
 
-.common{ color:#aaa; }
-.rare{ color:#00c3ff; }
-.epic{ color:#b84dff; }
-.legendary{ color:#ffd700; }
-.godly{ color:#ff0033; }
-.samet{ color:#00ff99; }
+.common{color:#aaa;}
+.rare{color:#00c3ff;}
+.epic{color:#b84dff;}
+.legendary{color:#ffd700;}
+.godly{color:#ff0033;}
+.samet{color:#00ff99;}
 
-#luckCounter{
-    color:#00ff99;
-}
-
-/* BAR */
 #bar{
     width:100%;
     height:10px;
     background:#222;
-    border-radius:10px;
-    overflow:hidden;
 }
 
 #fill{
-    width:0%;
     height:100%;
+    width:0%;
     background:white;
 }
 
-/* INVENTORY */
-#inv{
-    margin-top:10px;
-    font-size:14px;
-}
-
-/* CUTSCENE SAMET */
-.cutscene{
-    position:fixed;
-    inset:0;
-    background:black;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:999;
-}
-
-.hidden{ display:none; }
-
-.cutscene img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-}
-
-/* ⭐ EFFECT STAR */
-#effectStar{
-    position:fixed;
-    top:50%;
-    left:50%;
-    width:80px;
-    height:80px;
-    background:conic-gradient(red,yellow,green,cyan,blue,magenta,red);
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 
-                       68% 57%, 79% 91%, 50% 70%, 
-                       21% 91%, 32% 57%, 2% 35%, 
-                       39% 35%);
-    transform:translate(-50%,-50%) scale(0.2);
-    opacity:0;
-    z-index:9999;
-}
-
-/* ⚪ FLASH */
 #flash{
     position:fixed;
     inset:0;
     background:white;
     opacity:0;
-    z-index:10000;
+    pointer-events:none;
+}
+
+#star{
+    position:fixed;
+    top:50%;
+    left:50%;
+    width:70px;
+    height:70px;
+    background:conic-gradient(red,yellow,green,cyan,blue,red);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    transform:translate(-50%,-50%) scale(0.2);
+    opacity:0;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🔥 RNG SYSTEM</h1>
+<h1>RNG SYSTEM</h1>
 
 <div class="card">
 
@@ -133,23 +89,15 @@ button{
 <button class="autoBtn" onclick="toggleAuto()">AUTO</button>
 
 <div id="result">?</div>
-<div id="luckCounter">🍀 0/10</div>
 
 <div id="bar"><div id="fill"></div></div>
-
-<input id="code" placeholder="Kod">
-<button onclick="useCode()">KOD</button>
 
 <div id="inv"></div>
 
 </div>
 
-<div id="cut" class="cutscene hidden">
-<img id="cutimg">
-</div>
-
-<div id="effectStar"></div>
 <div id="flash"></div>
+<div id="star"></div>
 
 <script>
 
@@ -166,68 +114,34 @@ let inv=[];
 let auto=false;
 let loop;
 let luck=0;
-
-let deriaNext=false;
-let sametNext=false;
+let lock=false;
 
 /* INVENTORY */
 function updateInv(){
 document.getElementById("inv").innerHTML=inv.join("<br>");
 }
 
-/* SAMET CUTSCENE */
-function cut(img){
-let c=document.getElementById("cut");
-let i=document.getElementById("cutimg");
-i.src=img;
-c.classList.remove("hidden");
+/* EFFECT */
+function effect(item){
 
-setTimeout(()=>{
-c.classList.add("hidden");
-i.src="";
-},1800);
-}
-
-/* CODE */
-function useCode(){
-let c=document.getElementById("code").value.trim();
-
-if(c==="MALEREN31") deriaNext=true;
-else if(c==="İYİKİDOGDUNSAMET") sametNext=true;
-else alert("wrong");
-
-document.getElementById("code").value="";
-}
-
-/* SHAKE */
-function shake(){
-document.body.style.transform="translate(4px,4px)";
-setTimeout(()=>document.body.style.transform="translate(-4px,0)",40);
-setTimeout(()=>document.body.style.transform="translate(0,0)",80);
-}
-
-/* ⭐ AURA EFFECT */
-function aura(item){
-
-let star=document.getElementById("effectStar");
+let star=document.getElementById("star");
 let flash=document.getElementById("flash");
 
-let s=0.2;
+let scale=0.2;
 let rot=0;
 
 star.style.opacity=1;
 
 let anim=setInterval(()=>{
 
-s+=0.05;
-rot+=10;
+scale+=0.04;
+rot+=8;
 
-star.style.transform=
-`translate(-50%,-50%) scale(${s}) rotate(${rot}deg)`;
+star.style.transform=`translate(-50%,-50%) scale(${scale}) rotate(${rot}deg)`;
 
-shake();
+document.body.style.transform="translate(2px,2px)";
 
-if(s>=3){
+if(scale>2.5){
 
 clearInterval(anim);
 
@@ -237,10 +151,9 @@ setTimeout(()=>{
 
 flash.style.opacity=0;
 star.style.opacity=0;
+document.body.style.transform="none";
 
-document.getElementById("result").innerText=
-"✨ "+item.name.toUpperCase()+" ✨";
-
+document.getElementById("result").innerText=item.name;
 document.getElementById("result").className=item.class;
 
 },200);
@@ -252,81 +165,55 @@ document.getElementById("result").className=item.class;
 
 /* BAR */
 function bar(cb){
+
+if(lock) return;
+lock=true;
+
 let f=document.getElementById("fill");
 let w=0;
 
 let t=setInterval(()=>{
 
-w+=6;
+w+=5;
 f.style.width=w+"%";
 
 if(w>=100){
 clearInterval(t);
 f.style.width="0%";
+lock=false;
 cb();
 }
 
-},25);
+},20);
 }
 
 /* ROLL */
 function roll(){
 
-luck++;
-if(luck>10) luck=1;
+if(lock) return;
 
-document.getElementById("luckCounter").innerText="🍀 "+luck+"/10";
+let r=Math.random()*100;
+let sum=0;
 
-/* GUARANTEES */
-if(sametNext){
-sametNext=false;
-let s=items.find(i=>i.name==="Samet");
-cut(s.gif);
-inv.push("Samet");
-updateInv();
-return;
-}
+for(let i of items){
 
-if(deriaNext){
-deriaNext=false;
-let d=items.find(i=>i.name==="Deria");
-document.getElementById("result").innerText="DERIA";
-inv.push("Deria");
-updateInv();
-cut(d.gif);
-return;
-}
+sum+=i.chance;
 
-let multi=(luck===10)?2:1;
-
-let pool=items.map(i=>({
-...i,
-chance:i.class!=="common"?i.chance*multi:i.chance
-}));
-
-let total=pool.reduce((a,b)=>a+b.chance,0);
-let r=Math.random()*total;
-let s=0;
-
-for(let i of pool){
-
-s+=i.chance;
-
-if(r<=s){
+if(r<=sum){
 
 if(i.name==="Samet"){
-cut(i.gif);
+document.getElementById("result").innerText="SAMET";
 }else{
-aura(i);
+effect(i);
 }
 
 inv.push(i.name);
 updateInv();
-
 return;
 }
 
 }
+
 }
 
 /* AUTO */
@@ -338,11 +225,9 @@ if(auto){
 
 loop=setInterval(()=>{
 
-if(document.getElementById("cut").classList.contains("hidden")){
 bar(()=>roll());
-}
 
-},500);
+},600);
 
 }else{
 clearInterval(loop);
