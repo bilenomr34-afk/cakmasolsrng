@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>RNG SYSTEM</title>
+<title>Gacha RNG</title>
 
 <style>
 body{
@@ -11,10 +11,12 @@ body{
     color:white;
     font-family:Arial;
     text-align:center;
-    transition:0.1s;
 }
 
-h1{ margin-top:20px; }
+h1{
+    margin-top:20px;
+    text-shadow:0 0 15px #6a00ff;
+}
 
 .card{
     width:420px;
@@ -51,9 +53,9 @@ button{
 
 #luckCounter{
     color:#00ff99;
+    margin-bottom:10px;
 }
 
-/* BAR */
 #bar{
     width:100%;
     height:10px;
@@ -68,13 +70,6 @@ button{
     background:white;
 }
 
-/* INVENTORY */
-#inv{
-    margin-top:10px;
-    font-size:14px;
-}
-
-/* CUTSCENE */
 .cutscene{
     position:fixed;
     inset:0;
@@ -82,7 +77,6 @@ button{
     display:flex;
     justify-content:center;
     align-items:center;
-    z-index:999;
 }
 
 .hidden{ display:none; }
@@ -93,37 +87,18 @@ button{
     object-fit:contain;
 }
 
-/* STAR */
-#effectStar{
-    position:fixed;
-    top:50%;
-    left:50%;
-    width:80px;
-    height:80px;
-    background:conic-gradient(red,yellow,green,cyan,blue,magenta,red);
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 
-                       68% 57%, 79% 91%, 50% 70%, 
-                       21% 91%, 32% 57%, 2% 35%, 
-                       39% 35%);
-    transform:translate(-50%,-50%) scale(0.2);
-    opacity:0;
-    z-index:9999;
-}
-
-/* FLASH */
-#flash{
-    position:fixed;
-    inset:0;
-    background:white;
-    opacity:0;
-    z-index:10000;
+input{
+    padding:10px;
+    border-radius:10px;
+    border:none;
+    width:60%;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🔥 RNG SYSTEM</h1>
+<h1>🔥 RNG</h1>
 
 <div class="card">
 
@@ -135,8 +110,10 @@ button{
 
 <div id="bar"><div id="fill"></div></div>
 
+<br>
+
 <input id="code" placeholder="Kod">
-<button onclick="useCode()">KOD</button>
+<button onclick="useCode()">OK</button>
 
 <div id="inv"></div>
 
@@ -146,50 +123,38 @@ button{
 <img id="cutimg">
 </div>
 
-<div id="effectStar"></div>
-<div id="flash"></div>
-
 <script>
 
 const items=[
-{name:"Cihan",chance:60,class:"common",gif:""},
-{name:"Ferit",chance:25,class:"rare",gif:""},
-{name:"Pedo",chance:10,class:"epic",gif:""},
-{name:"Lezbi",chance:4,class:"legendary",gif:""},
-{name:"Deria",chance:1,class:"godly",gif:""},
-{name:"Samet",chance:0.0001,class:"samet",gif:""}
+{name:"Cihan",chance:60,class:"common",gif:"https://media1.tenor.com/m/flyOCJGMcWcAAAAd/monarch-developer.gif"},
+{name:"Ferit",chance:25,class:"rare",gif:"https://media1.tenor.com/m/DM67oDEzHWgAAAAd/aegis-sols-rng.gif"},
+{name:"Pedo",chance:10,class:"epic",gif:"https://media1.tenor.com/m/v2_lxnj_Z3kAAAAd/oblivion-sols-rng-oblivion.gif"},
+{name:"Lezbi",chance:4,class:"legendary",gif:"https://media1.tenor.com/m/A1-dKFSCrs8AAAAC/sols-rng-malestorm.gif"},
+{name:"Deria",chance:1,class:"godly",gif:"https://media1.tenor.com/m/iao77UYOTnkAAAAd/oppression-cutscene.gif"},
+{name:"Samet",chance:0.0001,class:"samet",gif:"samet.png"}
 ];
 
 let inv=[];
 let auto=false;
 let loop;
 let luck=0;
-let deriaNext=false;
-let sametNext=false;
 let lock=false;
 
-/* INVENTORY */
+let deriaNext=false;
+let sametNext=false;
+
 function updateInv(){
 document.getElementById("inv").innerHTML=inv.join("<br>");
 }
 
-/* CUTSCENE SAFE */
 function cut(img){
-if(!img) return;
-
 let c=document.getElementById("cut");
 let i=document.getElementById("cutimg");
-
 i.src=img;
 c.classList.remove("hidden");
-
-setTimeout(()=>{
-c.classList.add("hidden");
-i.src="";
-},1800);
+setTimeout(()=>{c.classList.add("hidden");i.src=""},1500);
 }
 
-/* CODE */
 function useCode(){
 let c=document.getElementById("code").value.trim();
 
@@ -200,60 +165,7 @@ else alert("wrong");
 document.getElementById("code").value="";
 }
 
-/* SHAKE */
-function shake(){
-document.body.style.transform="translate(3px,3px)";
-setTimeout(()=>document.body.style.transform="translate(-3px,0)",40);
-setTimeout(()=>document.body.style.transform="translate(0,0)",80);
-}
-
-/* AURA */
-function aura(item){
-
-let star=document.getElementById("effectStar");
-let flash=document.getElementById("flash");
-
-let s=0.2;
-let rot=0;
-
-star.style.opacity=1;
-
-let anim=setInterval(()=>{
-
-s+=0.05;
-rot+=10;
-
-star.style.transform=
-`translate(-50%,-50%) scale(${s}) rotate(${rot}deg)`;
-
-shake();
-
-if(s>=3){
-
-clearInterval(anim);
-
-flash.style.opacity=1;
-
-setTimeout(()=>{
-
-flash.style.opacity=0;
-star.style.opacity=0;
-
-document.getElementById("result").innerText=
-"✨ "+item.name.toUpperCase()+" ✨";
-
-document.getElementById("result").className=item.class;
-
-},200);
-
-}
-
-},30);
-}
-
-/* BAR */
 function bar(cb){
-
 if(lock) return;
 lock=true;
 
@@ -261,7 +173,6 @@ let f=document.getElementById("fill");
 let w=0;
 
 let t=setInterval(()=>{
-
 w+=6;
 f.style.width=w+"%";
 
@@ -271,11 +182,9 @@ f.style.width="0%";
 lock=false;
 cb();
 }
-
-},25);
+},30);
 }
 
-/* ROLL */
 function roll(){
 
 if(lock) return;
@@ -285,22 +194,23 @@ if(luck>10) luck=1;
 
 document.getElementById("luckCounter").innerText="🍀 "+luck+"/10";
 
-/* GUARANTEES */
 if(sametNext){
 sametNext=false;
 let s=items.find(i=>i.name==="Samet");
-cut(s.gif);
+document.getElementById("result").innerText="SAMET";
 inv.push("Samet");
 updateInv();
+cut(s.gif);
 return;
 }
 
 if(deriaNext){
 deriaNext=false;
 let d=items.find(i=>i.name==="Deria");
-cut(d.gif);
+document.getElementById("result").innerText="DERIA";
 inv.push("Deria");
 updateInv();
+cut(d.gif);
 return;
 }
 
@@ -313,49 +223,35 @@ chance:i.class!=="common"?i.chance*multi:i.chance
 
 let total=pool.reduce((a,b)=>a+b.chance,0);
 let r=Math.random()*total;
-let sum=0;
+let s=0;
 
 for(let i of pool){
+s+=i.chance;
+if(r<=s){
 
-sum+=i.chance;
-
-if(r<=sum){
-
-if(i.name==="Samet"){
-cut(i.gif);
-}
-
-aura(i);
+document.getElementById("result").innerText=i.name;
+document.getElementById("result").className=i.class;
 
 inv.push(i.name);
 updateInv();
+cut(i.gif);
+
 return;
 }
-
 }
 }
 
-/* AUTO */
 function toggleAuto(){
-
 auto=!auto;
 
 if(auto){
-
 loop=setInterval(()=>{
-
-if(!document.getElementById("cut").classList.contains("hidden")) return;
-if(lock) return;
-
-bar(()=>roll());
-
-},500);
-
+let c=document.getElementById("cut").classList.contains("hidden");
+if(c) bar(()=>roll());
+},600);
 }else{
 clearInterval(loop);
-document.getElementById("fill").style.width="0%";
 }
-
 }
 
 </script>
