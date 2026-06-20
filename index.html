@@ -26,6 +26,13 @@ button{
 .rollBtn{ background:#6a00ff; }
 .autoBtn{ background:#ff006a; }
 
+input{
+    padding:10px;
+    font-size:18px;
+    border-radius:8px;
+    border:none;
+}
+
 #result{
     margin-top:30px;
     font-size:40px;
@@ -41,7 +48,6 @@ button{
     text-shadow:0 0 20px red;
 }
 
-/* CUTSCENE */
 .cutscene{
     position:fixed;
     inset:0;
@@ -62,11 +68,17 @@ button{
     object-fit:cover;
 }
 
-/* INVENTORY */
 #inventory{
     margin-top:20px;
     border-top:1px solid #333;
     padding-top:10px;
+}
+
+#luckCounter{
+    margin-top:15px;
+    font-size:22px;
+    color:lime;
+    font-weight:bold;
 }
 </style>
 </head>
@@ -79,10 +91,16 @@ button{
 
 <div id="result">?</div>
 
+<div id="luckCounter">🍀 Luck: 0/10</div>
+
+<br><br>
+
+<input type="password" id="codeInput" placeholder="Kod Gir">
+<button onclick="useCode()">KODU KULLAN</button>
+
 <h2>🎒 Inventory</h2>
 <div id="inventory"></div>
 
-<!-- CUTSCENE -->
 <div id="cutscene" class="cutscene hidden">
     <img id="cutsceneGif">
 </div>
@@ -126,6 +144,8 @@ let inventory = [];
 let auto = false;
 let interval;
 let rollCount = 0;
+let luckProgress = 0;
+let guaranteedDeria = false;
 
 function updateInventory(){
     document.getElementById("inventory").innerHTML =
@@ -146,13 +166,61 @@ function showCutscene(gif){
     }, 1800);
 }
 
+function useCode(){
+
+    const code = document.getElementById("codeInput").value.trim();
+
+    if(code === "MALEREN31"){
+
+        guaranteedDeria = true;
+
+        alert("✅ Kod kabul edildi! Sonraki roll Deria olacak.");
+
+        document.getElementById("codeInput").value = "";
+
+    }else{
+
+        alert("❌ Geçersiz kod.");
+
+    }
+}
+
 function roll(){
+
+    luckProgress++;
+
+    if(luckProgress > 10){
+        luckProgress = 1;
+    }
+
+    document.getElementById("luckCounter").innerHTML =
+        "🍀 Luck: " + luckProgress + "/10";
+
+    if(guaranteedDeria){
+
+        guaranteedDeria = false;
+
+        const deria = items.find(i => i.name === "Deria");
+
+        const res = document.getElementById("result");
+
+        res.innerHTML = "Deria 🔥 CODE";
+        res.className = deria.class;
+
+        inventory.push(deria.name);
+
+        updateInventory();
+
+        showCutscene(deria.gif);
+
+        return;
+    }
 
     rollCount++;
 
     let luckMultiplier = 1;
 
-    if(rollCount % 10 === 0){
+    if(luckProgress === 10){
         luckMultiplier = 2;
     }
 
@@ -184,10 +252,13 @@ function roll(){
 
             const res = document.getElementById("result");
 
-            res.innerHTML =
-                item.name +
-                (rollCount % 10 === 0 ? " 🍀 2x LUCK" : "");
+            let text = item.name;
 
+            if(luckProgress === 10){
+                text += " 🍀 2x LUCK";
+            }
+
+            res.innerHTML = text;
             res.className = item.class;
 
             inventory.push(item.name);
@@ -210,8 +281,7 @@ function toggleAuto(){
         interval = setInterval(() => {
 
             const cutsceneOpen =
-                !document
-                .getElementById("cutscene")
+                !document.getElementById("cutscene")
                 .classList.contains("hidden");
 
             if(!cutsceneOpen){
