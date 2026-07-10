@@ -187,7 +187,91 @@ h1{
 </div>
 
 <script>
+document.addEventListener("keydown", handleKey);
 
+function handleKey(e){
+
+    if(gameOver) return;
+
+    let key=e.key.toUpperCase();
+
+    if(key==="BACKSPACE"){
+
+        deleteLetter();
+        return;
+
+    }
+
+    if(key==="ENTER"){
+
+        submitGuess();
+        return;
+
+    }
+
+    if(key.length!==1) return;
+
+    const letters="ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZQWX";
+
+    if(!letters.includes(key)) return;
+
+    addLetter(key);
+
+}
+
+function addLetter(letter){
+
+    if(col>=5) return;
+
+    const index=row*5+col;
+
+    tiles[index].textContent=letter;
+
+    col++;
+
+}
+
+function deleteLetter(){
+
+    if(col<=0) return;
+
+    col--;
+
+    const index=row*5+col;
+
+    tiles[index].textContent="";
+
+}
+
+function submitGuess(){
+
+    if(col<5){
+
+        message.textContent="5 harf gir.";
+
+        return;
+
+    }
+
+    let guess="";
+
+    for(let i=0;i<5;i++){
+
+        guess+=tiles[row*5+i].textContent.toLowerCase();
+
+    }
+
+    if(!KELIMELER.includes(guess)){
+
+        message.textContent="Kelime bulunamadı.";
+
+        return;
+
+    }
+
+    checkGuess(guess);
+
+}
 const KELIMELER=[
 
 "a"
@@ -214,3 +298,5 @@ board.appendChild(tile);
 const tiles=document.querySelectorAll(".tile");
 
 </script>
+
+
