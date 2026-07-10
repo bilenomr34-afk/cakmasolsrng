@@ -1,154 +1,216 @@
-
 <!DOCTYPE html>
-<html lang="tr"><head><meta charset="UTF-8"><title>Wordle TR</title>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Wordle TR</title>
+
 <style>
-body{font-family:Arial;background:#121213;color:#fff;display:flex;flex-direction:column;align-items:center}
-#grid{display:grid;grid-template-columns:repeat(5,60px);gap:6px;margin:20px}
-.cell{width:60px;height:60px;border:2px solid #3a3a3c;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold}
-button{margin:8px;padding:10px 18px}
-</style></head><body>
-<h1>Wordle TR</h1>
-<p>Bu iskelet sürümdür. Kelime listesi çok büyük olduğu için bu sohbete sığmıyor. KELIMELER dizisine 5 harfli kelimeleri ekleyin.</p>
-<div id="grid"></div><button onclick="newGame()">Yeni Oyun</button>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#121213;
+    color:white;
+    font-family:Arial,Helvetica,sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+}
+
+h1{
+    margin:20px;
+    font-size:42px;
+}
+
+#board{
+    display:grid;
+    grid-template-columns:repeat(5,70px);
+    grid-template-rows:repeat(6,70px);
+    gap:6px;
+    margin-top:20px;
+}
+
+.tile{
+    width:70px;
+    height:70px;
+    border:2px solid #3a3a3c;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:34px;
+    font-weight:bold;
+    text-transform:uppercase;
+    user-select:none;
+}
+
+.correct{
+    background:#6aaa64;
+    border-color:#6aaa64;
+}
+
+.present{
+    background:#c9b458;
+    border-color:#c9b458;
+}
+
+.absent{
+    background:#3a3a3c;
+    border-color:#3a3a3c;
+}
+
+#keyboard{
+    margin-top:35px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.row{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+}
+
+.key{
+    width:44px;
+    height:58px;
+    background:#818384;
+    border:none;
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.key.big{
+    width:82px;
+}
+
+.green{
+    background:#6aaa64;
+}
+
+.yellow{
+    background:#c9b458;
+}
+
+.gray{
+    background:#3a3a3c;
+}
+
+#message{
+    margin-top:20px;
+    height:25px;
+    font-size:18px;
+}
+
+#newGame{
+    display:none;
+    margin-top:20px;
+    padding:12px 28px;
+    font-size:18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>WORDLE TR</h1>
+
+<div id="board"></div>
+
+<div id="message"></div>
+
+<button id="newGame">Yeni Oyun</button>
+
+<div id="keyboard">
+
+<div class="row">
+<button class="key">Q</button>
+<button class="key">W</button>
+<button class="key">E</button>
+<button class="key">R</button>
+<button class="key">T</button>
+<button class="key">Y</button>
+<button class="key">U</button>
+<button class="key">I</button>
+<button class="key">O</button>
+<button class="key">P</button>
+<button class="key">Ğ</button>
+<button class="key">Ü</button>
+</div>
+
+<div class="row">
+<button class="key">A</button>
+<button class="key">S</button>
+<button class="key">D</button>
+<button class="key">F</button>
+<button class="key">G</button>
+<button class="key">H</button>
+<button class="key">J</button>
+<button class="key">K</button>
+<button class="key">L</button>
+<button class="key">Ş</button>
+<button class="key">İ</button>
+</div>
+
+<div class="row">
+<button class="key big" data-key="ENTER">ENTER</button>
+
+<button class="key">Z</button>
+<button class="key">X</button>
+<button class="key">C</button>
+<button class="key">V</button>
+<button class="key">B</button>
+<button class="key">N</button>
+<button class="key">M</button>
+<button class="key">Ö</button>
+<button class="key">Ç</button>
+
+<button class="key big" data-key="BACK">⌫</button>
+
+</div>
+
+</div>
+
 <script>
-const KELIMELER=["const KELIMELER = [
-"abide",
-"abone",
-"acele",
-"acemi",
-"adres",
-"afyon",
-"ahbap",
-"ahenk",
-"ahize",
-"ahlak",
-"ahlat",
-"ahval",
-"aidat",
-"ajans",
-"akıcı",
-"akort",
-"akran",
-"akrep",
-"akşam",
-"alaka",
-"alarm",
-"alçak",
-"aleni",
-"alevi",
-"alıcı",
-"alkol",
-"altın",
-"ambar",
-"amigo",
-"amorf",
-"amper",
-"ampul",
-"armut",
-"arazi",
-"ardıç",
-"arena",
-"arife",
-"asker",
-"aslan",
-"astar",
-"astım",
-"asil",
-"aşama",
-"aşina",
-"atlas",
-"atlet",
-"avans",
-"avize",
-"aydın",
-"ayran",
-"azami",
-"azize",
-"azman",
-"bacak",
-"badem",
-"bagaj",
-"baget",
-"bağcı",
-"bağış",
-"bağlı",
-"bahar",
-"bahçe",
-"bahis",
-"bakır",
-"bakış",
-"bakla",
-"balat",
-"balcı",
-"balet",
-"balık",
-"balon",
-"balta",
-"bamya",
-"banka",
-"banyo",
-"baraj",
-"baret",
-"barış",
-"barok",
-"baron",
-"barut",
-"basen",
-"basık",
-"basım",
-"basın",
-"basit",
-"baskı",
-"basma",
-"başak",
-"başka",
-"başlı",
-"batak",
-"batık",
-"batıl",
-"bavul",
-"bayan",
-"bayat",
-"bayır",
-"bayram",
-"bazen",
-"bazik",
-"bebek",
-"bedel",
-"beden",
-"bekçi",
-"belde",
-"belge",
-"belki",
-"belli",
-"bemol",
-"bence",
-"benek",
-"beniz",
-"benli",
-"berat",
-"beril",
-"besin",
-"beste",
-"beşik",
-"beter",
-"betik",
-"betim",
-"beton",
-"beyan",
-"beyaz",
-"beyin",
-"beyit"
-];"];
-let answer="";
-const grid=document.getElementById("grid");
-for(let i=0;i<30;i++){let d=document.createElement("div");d.className="cell";grid.appendChild(d);}
-function newGame(){answer=KELIMELER[Math.floor(Math.random()*KELIMELER.length)];console.log(answer);alert("Yeni oyun başladı!");}
-newGame();const KELIMELER = [
-abide, abone, acele, acemi, acımasız, aktör, adres, afişe, afyon, ahbap, ahenk, ahize, ahlak, ahlat, ahval, aidat, ajans, akıcı, akort, akran, akrep, akşam, alaka, alarm, alçak, aleni, alevi, alıcı, alkol, altın, ambar, amca, amigo, amorf, amper, ampul, armut, arazi, ardıç, arena, arife, arsa, arşiv, asker, aslan, astar, astım, asil, aşama, aşina, atlas, atlet, avans, avize, avukat, aydın, ayran, azami, azize, azman, azot, bacak, badem, bagaj, baget, bağcı, bağış, bağlı, bahar, bahçe, bahis, bakır, bakış, bakla, balat, balcı, balet, balık, balon, balta, bamya, banka, banyo, baraj, barda, baret, barış, barok, baron, barut, basen, basık, basım, basın, basit, baskı, basma, başak, başka, başlı, batak, batık, batıl, bavul, bayan, bayat, bayır, bayram, bazen, bazik, bebek, bedel, beden, bekçi, belde, belge, belki, belli, bemol, bence, benek, beniz, benli, berat, beril, besin, beste, beşik, beter, betik, betim, beton, beyan, beyaz, beyin, beyit, bıçak, bıyık, biber, biblo, biçem, biçim, bidon, bilek, bilet, bilge, bilgi, bilim, bilye, binek, biraz, birey, birim, bitik, bitim, bitki, bloke, bluz, bodur, boğaz, bohça, bomba, bordo, borsa, boyun, boyut, bozuk, böcek, bölme, bölük, bölüm, börek, böyle, branş, bravo, bronz, bröve, bucak, buçuk, budak, bugün, buğra, buhar, buket, bukle, bulgu, buluş, bulut, bunak, burcu, burgu, burma, bursa, buruk, burun, butik, buton, bütçe, bütün, büyük, cacık, cadde, cahil, caiz, camcı, camia, camız, camlı, canan, canlı, cansız, casus, cayma, cazcı, cazıp, cazlı, cebel, cebir, cebin, cedit, cezai, cezir, ceviz, cezve, cıbıl, cıvık, cıvıltı, cici, cicoz, cidar, ciddi, ciğer, cihaz, cihet, cilve, cimri, cinsi, cisim, civar, civiv, cizye, conta, coşku, coşma, coşum, cübbe, cücük, cülus, cüret, cürüm, cüsse, çabuk, çadır, çağla, çağrı, çakıl, çakım, çakır, çakış, çakma, çalgı, çalık, çalıma, çamur, çanak, çanta, çapak, çapar, çaplı, çapma, çarda, çarşı, çatal, çatık, çatış, çatma, çavuş, çaycı, çayır, çaylı, çebiç, çekiç, çekik, çekim, çekiş, çekme, çelebi, çelik, çeltik, çemenz, çene, çengi, çeper, çeçen, çeşid, çeşit, çeşme, çetin, çevik, çevre, çeyiz, çıban, çırak, çınar, çıray, çıtçıt, çiçek, çifçi, çift, çigan, çilek, çilli, çimen, çınar, çinko, çiriş, çiroz, çizgi, çizik, çizim, çizme, çoban, çocuk, çoğul, çökel, çömez, çömlek, çöpçü, çöplü, çözme, çözüm, çözüş, çubuk, çuval, çuha, çürük, dadaş, dahil, daima, daire, dakik, dalak, dalaş, dalga, dalgı, dalış, dalma, damak, damar, damla, damlı, darbe, darca, dargın, dikey, darıl, deha, dekar, dekor, delik, delil, delme, delta, demet, demir, demli, denet, deney, deniz, denli, depoz, derbi, dergi, derin, derme, derpi, derya, desen, deste, deşik, deşme, detay, devam, devir, devre, devri, deyim, deyiş, dışkı, dışlı, dımdız, diyar, dicle, didim, didon, diger, diğer, dikçe, dikeç, dikey, dikik, dikim, dikit, dikiz, dikme
-    // BURAYA TÜM KELİMELERİNİ YAPIŞTIR
+
+const KELIMELER=[
+
+"a"
 
 ];
 
-let answer = KELIMELER[Math.floor(Math.random() * KELIMELER.length)];
+let answer="";
+let row=0;
+let col=0;
+let gameOver=false;
+
+const board=document.getElementById("board");
+
+for(let i=0;i<30;i++){
+
+const tile=document.createElement("div");
+
+tile.className="tile";
+
+board.appendChild(tile);
+
+}
+
+const tiles=document.querySelectorAll(".tile");
+
 </script>
