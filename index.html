@@ -187,6 +187,31 @@ h1{
 </div>
 
 <script>
+function submitGuess(){
+
+    if(col!=5){
+        message.textContent="5 harf yaz!";
+        return;
+    }
+
+    let guess="";
+
+    for(let i=0;i<5;i++){
+
+        guess+=tiles[row*5+i].textContent.toLowerCase();
+
+    }
+
+    if(!KELIMELER.includes(guess)){
+        message.textContent="Bu kelime listede yok!";
+        return;
+    }
+
+    message.textContent="";
+
+    checkGuess(guess);
+
+}
 document.addEventListener("keydown", handleKey);
 
 function handleKey(e){
