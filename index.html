@@ -3,129 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<div id="board"></div>
 <title>Wordle TR</title>
 
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
-    background:#121213;
-    color:white;
-    font-family:Arial,Helvetica,sans-serif;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    min-height:100vh;
+body {
+    background: #121213;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
 }
 
-h1{
-    margin:20px;
-    font-size:42px;
+h1 {
+    margin: 20px;
+    font-size: 42px;
 }
 
-#board{
-    display:grid;
-    grid-template-columns:repeat(5,70px);
-    grid-template-rows:repeat(6,70px);
-    gap:6px;
-    margin-top:20px;
+#board {
+    display: grid;
+    grid-template-columns: repeat(5, 70px);
+    grid-template-rows: repeat(6, 70px);
+    gap: 6px;
+    margin-top: 20px;
 }
 
-.tile{
-    width:70px;
-    height:70px;
-    border:2px solid #3a3a3c;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:34px;
-    font-weight:bold;
-    text-transform:uppercase;
-    user-select:none;
+.tile {
+    width: 70px;
+    height: 70px;
+    border: 2px solid #3a3a3c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 34px;
+    font-weight: bold;
+    text-transform: uppercase;
+    user-select: none;
 }
 
-.correct{
-    background:#6aaa64;
-    border-color:#6aaa64;
+.correct {
+    background: #6aaa64;
+    border-color: #6aaa64;
 }
 
-.present{
-    background:#c9b458;
-    border-color:#c9b458;
+.present {
+    background: #c9b458;
+    border-color: #c9b458;
 }
 
-.absent{
-    background:#3a3a3c;
-    border-color:#3a3a3c;
+.absent {
+    background: #3a3a3c;
+    border-color: #3a3a3c;
 }
 
-#keyboard{
-    margin-top:35px;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
+#keyboard {
+    margin-top: 35px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 20px;
 }
 
-.row{
-    display:flex;
-    justify-content:center;
-    gap:6px;
+.row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
 }
 
-.key{
-    width:44px;
-    height:58px;
-    background:#818384;
-    border:none;
-    color:white;
-    font-size:18px;
-    font-weight:bold;
-    border-radius:6px;
-    cursor:pointer;
+.key {
+    width: 44px;
+    height: 58px;
+    background: #818384;
+    border: none;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
 }
 
-.key.big{
-    width:82px;
+.key.big {
+    width: 82px;
 }
 
-.green{
-    background:#6aaa64;
+#message {
+    margin-top: 20px;
+    height: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #c9b458;
 }
 
-.yellow{
-    background:#c9b458;
+#newGame {
+    display: none;
+    margin-top: 20px;
+    padding: 12px 28px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #6aaa64;
+    color: white;
+    font-weight: bold;
 }
 
-.gray{
-    background:#3a3a3c;
+#newGame:hover {
+    background-color: #538d4e;
 }
-
-#message{
-    margin-top:20px;
-    height:25px;
-    font-size:18px;
-}
-
-#newGame{
-    display:none;
-    margin-top:20px;
-    padding:12px 28px;
-    font-size:18px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-}
-
 </style>
-
 </head>
-
 <body>
 
 <h1>WORDLE TR</h1>
@@ -137,315 +131,267 @@ h1{
 <button id="newGame">Yeni Oyun</button>
 
 <div id="keyboard">
-
-<div class="row">
-<button class="key">Q</button>
-<button class="key">W</button>
-<button class="key">E</button>
-<button class="key">R</button>
-<button class="key">T</button>
-<button class="key">Y</button>
-<button class="key">U</button>
-<button class="key">I</button>
-<button class="key">O</button>
-<button class="key">P</button>
-<button class="key">Ğ</button>
-<button class="key">Ü</button>
-</div>
-
-<div class="row">
-<button class="key">A</button>
-<button class="key">S</button>
-<button class="key">D</button>
-<button class="key">F</button>
-<button class="key">G</button>
-<button class="key">H</button>
-<button class="key">J</button>
-<button class="key">K</button>
-<button class="key">L</button>
-<button class="key">Ş</button>
-<button class="key">İ</button>
-</div>
-
-<div class="row">
-<button class="key big" data-key="ENTER">ENTER</button>
-
-<button class="key">Z</button>
-<button class="key">X</button>
-<button class="key">C</button>
-<button class="key">V</button>
-<button class="key">B</button>
-<button class="key">N</button>
-<button class="key">M</button>
-<button class="key">Ö</button>
-<button class="key">Ç</button>
-
-<button class="key big" data-key="BACK">⌫</button>
-
-</div>
-
+    <div class="row">
+        <button class="key">Q</button>
+        <button class="key">W</button>
+        <button class="key">E</button>
+        <button class="key">R</button>
+        <button class="key">T</button>
+        <button class="key">Y</button>
+        <button class="key">U</button>
+        <button class="key">I</button>
+        <button class="key">O</button>
+        <button class="key">P</button>
+        <button class="key">Ğ</button>
+        <button class="key">Ü</button>
+    </div>
+    <div class="row">
+        <button class="key">A</button>
+        <button class="key">S</button>
+        <button class="key">D</button>
+        <button class="key">F</button>
+        <button class="key">G</button>
+        <button class="key">H</button>
+        <button class="key">J</button>
+        <button class="key">K</button>
+        <button class="key">L</button>
+        <button class="key">Ş</button>
+        <button class="key">İ</button>
+    </div>
+    <div class="row">
+        <button class="key big" data-key="ENTER">ENTER</button>
+        <button class="key">Z</button>
+        <button class="key">X</button>
+        <button class="key">C</button>
+        <button class="key">V</button>
+        <button class="key">B</button>
+        <button class="key">N</button>
+        <button class="key">M</button>
+        <button class="key">Ö</button>
+        <button class="key">Ç</button>
+        <button class="key big" data-key="BACK">⌫</button>
+    </div>
 </div>
 
 <script>
-function submitGuess(){
-
-    if(col!=5){
-        message.textContent="5 harf yaz!";
-        return;
-    }
-
-    let guess="";
-
-    for(let i=0;i<5;i++){
-
-        guess+=tiles[row*5+i].textContent.toLowerCase();
-
-    }
-
-    if(!KELIMELER.includes(guess)){
-        message.textContent="Bu kelime listede yok!";
-        return;
-    }
-
-    message.textContent="";
-
-    checkGuess(guess);
-
-}
-document.addEventListener("keydown", handleKey);
-
-function handleKey(e){
-
-    if(gameOver) return;
-
-    let key=e.key.toUpperCase();
-
-    if(key==="BACKSPACE"){
-
-        deleteLetter();
-        return;
-
-    }
-
-    if(key==="ENTER"){
-
-        submitGuess();
-        return;
-
-    }
-
-    if(key.length!==1) return;
-
-    const letters="ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZQWX";
-
-    if(!letters.includes(key)) return;
-
-    addLetter(key);
-
-}
-
-function addLetter(letter){
-
-    if(col>=5) return;
-
-    const index=row*5+col;
-
-    tiles[index].textContent=letter;
-
-    col++;
-
-}
-
-function deleteLetter(){
-
-    if(col<=0) return;
-
-    col--;
-
-    const index=row*5+col;
-
-    tiles[index].textContent="";
-
-}
-
-function submitGuess(){
-
-    if(col<5){
-
-        message.textContent="5 harf gir.";
-
-        return;
-
-    }
-
-    let guess="";
-
-    for(let i=0;i<5;i++){
-
-        guess+=tiles[row*5+i].textContent.toLowerCase();
-
-    }
-
-    if(!KELIMELER.includes(guess)){
-
-        message.textContent="Kelime bulunamadı.";
-
-        return;
-
-    }
-
-    checkGuess(guess);
-
-}
-const KELIMELER=[
-"abide",
-"abone",
-"acele",
-"acemi",
-"adres",
-"afyon",
-"ahbap",
-"ahenk",
-"ahize",
-"ahlak",
-"ahlat",
-"ahval",
-"aidat",
-"ajans",
-"akıcı",
-"akort",
-"akran",
-"akrep",
-"akşam",
-"alaka",
-"alarm",
-"alçak",
-"aleni",
-"alevi",
-"alıcı",
-"alkol",
-"altın",
-"ambar",
-"amigo",
-"amorf",
-"amper",
-"ampul",
-"armut",
-"arazi",
-"ardıç",
-"arena",
-"arife",
-"asker",
-"aslan",
-"astar",
-"astım",
-"asil",
-"aşama",
-"aşina",
-"atlas",
-"atlet",
-"avans",
-"avize",
-"aydın",
-"ayran",
-"azami",
-"azize",
-"azman",
-"bacak",
-"badem",
-"bagaj",
-"baget",
-"bağcı",
-"bağış",
-"bağlı",
-"bahar",
-"bahçe",
-"bahis",
-"bakır",
-"bakış",
-"bakla",
-"balat",
-"balcı",
-"balet",
-"balık",
-"balon",
-"balta",
-"bamya",
-"banka",
-"banyo",
-"baraj",
-"baret",
-"barış",
-"barok",
-"baron",
-"barut",
-"basen",
-"basık",
-"basım",
-"basın",
-"basit",
-"baskı",
-"basma",
-"başak",
-"başka",
-"başlı",
-"batak",
-"batık",
-"batıl",
-"bavul",
-"bayan",
-"bayat",
-"bayır",
-"bayram",
-"bazen",
-"bazik",
-"bebek",
-"bedel",
-"beden",
-"bekçi",
-"belde",
-"belge",
-"belki",
-"belli",
-"bemol",
-"bence",
-"benek",
-"beniz",
-"benli",
-"berat",
-"beril",
-"besin",
-"beste",
-"beşik",
-"beter",
-"betik",
-"betim",
-"beton",
-"beyan",
-"beyaz",
-"beyin",
-"beyit"
-];"
-
+const KELIMELER = [
+    "abide", "abone", "acele", "acemi", "adres", "afyon", "ahbap", "ahenk", "ahize", "ahlak",
+    "ahlat", "ahval", "aidat", "ajans", "akıcı", "akort", "akran", "akrep", "akşam", "alaka",
+    "alarm", "alçak", "aleni", "alevi", "alıcı", "alkol", "altın", "ambar", "amigo", "amorf",
+    "amper", "ampul", "armut", "arazi", "ardıç", "arena", "arife", "asker", "aslan", "astar",
+    "astım", "asil",  "aşama", "aşina", "atlas", "atlet", "avans", "avize", "aydın", "ayran",
+    "azami", "azize", "azman", "bacak", "badem", "bagaj", "baget", "bağcı", "bağış", "bağlı",
+    "bahar", "bahçe", "bahis", "bakır", "bakış", "bakla", "balat", "balcı", "balet", "balık",
+    "balon", "balta", "bamya", "banka", "banyo", "baraj", "baret", "barış", "barok", "baron",
+    "barut", "basen", "basık", "basım", "basın", "basit", "baskı", "basma", "başak", "başka",
+    "başlı", "batak", "batık", "batıl", "bavul", "bayan", "bayat", "bayır", "bazen", "bazik",
+    "bebek", "bedel", "beden", "bekçi", "belde", "belge", "belki", "belli", "bemol", "bence",
+    "benek", "beniz", "benli", "berat", "beril", "besin", "beste", "beşik", "beter", "betik",
+    "betim", "beton", "beyan", "beyaz", "beyin", "beyit"
 ];
 
-let answer="";
-let row=0;
-let col=0;
-let gameOver=false;
+let answer = "";
+let row = 0;
+let col = 0;
+let gameOver = false;
 
-const board=document.getElementById("board");
+const board = document.getElementById("board");
+const message = document.getElementById("message");
+const newGameBtn = document.getElementById("newGame");
 
-for(let i=0;i<30;i++){
+// Grid oluşturma (6 satır x 5 sütun = 30 kutu)
+for (let i = 0; i < 30; i++) {
+    const tile = document.createElement("div");
+    tile.className = "tile";
+    board.appendChild(tile);
+}
+const tiles = document.querySelectorAll(".tile");
 
-const tile=document.createElement("div");
+// Oyunu Başlatma / Sıfırlama fonksiyonu
+function initGame() {
+    answer = KELIMELER[Math.floor(Math.random() * KELIMELER.length)].toLocaleUpperCase("tr-TR");
+    row = 0;
+    col = 0;
+    gameOver = false;
+    message.textContent = "";
+    newGameBtn.style.display = "none";
+    
+    // Grid kutularını temizle
+    tiles.forEach(tile => {
+        tile.textContent = "";
+        tile.className = "tile";
+    });
 
-tile.className="tile";
-
-board.appendChild(tile);
-
+    // Klavye buton renklerini sıfırla
+    const keys = document.querySelectorAll(".key");
+    keys.forEach(key => {
+        key.style.backgroundColor = "#818384";
+    });
 }
 
-const tiles=document.querySelectorAll(".tile");
+// Fiziki Klavye Dinleyicisi
+document.addEventListener("keydown", handleKey);
 
+function handleKey(e) {
+    if (gameOver) return;
+
+    let key = e.key.toLocaleUpperCase("tr-TR");
+
+    if (key === "BACKSPACE") {
+        deleteLetter();
+        return;
+    }
+
+    if (key === "ENTER") {
+        submitGuess();
+        return;
+    }
+
+    if (key.length !== 1) return;
+
+    const letters = "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZQWX";
+    if (!letters.includes(key)) return;
+
+    addLetter(key);
+}
+
+// Ekrandaki Sanal Klavye Dinleyicisi
+const keys = document.querySelectorAll(".key");
+keys.forEach(keyBtn => {
+    keyBtn.addEventListener("click", () => {
+        if (gameOver) return;
+
+        const dataKey = keyBtn.getAttribute("data-key");
+        const keyText = keyBtn.textContent;
+
+        if (dataKey === "ENTER") {
+            submitGuess();
+        } else if (dataKey === "BACK" || keyText === "⌫") {
+            deleteLetter();
+        } else {
+            addLetter(keyText.toLocaleUpperCase("tr-TR"));
+        }
+    });
+});
+
+function addLetter(letter) {
+    if (col >= 5) return;
+    const index = row * 5 + col;
+    tiles[index].textContent = letter;
+    col++;
+}
+
+function deleteLetter() {
+    if (col <= 0) return;
+    col--;
+    const index = row * 5 + col;
+    tiles[index].textContent = "";
+}
+
+function submitGuess() {
+    if (col < 5) {
+        message.textContent = "5 harf gir.";
+        return;
+    }
+
+    let guess = "";
+    for (let i = 0; i < 5; i++) {
+        guess += tiles[row * 5 + i].textContent;
+    }
+
+    // Arama yaparken Türkçe küçük harfe çevirerek listede kontrol ediyoruz
+    if (!KELIMELER.includes(guess.toLocaleLowerCase("tr-TR"))) {
+        message.textContent = "Kelime bulunamadı.";
+        return;
+    }
+
+    message.textContent = "";
+    checkGuess(guess);
+}
+
+function checkGuess(guess) {
+    let answerLetters = answer.split("");
+    let rowIndices = [];
+
+    // İlkin satırdaki ilgili indexleri topla
+    for (let i = 0; i < 5; i++) {
+        rowIndices.push(row * 5 + i);
+    }
+
+    // 1. Aşama: Doğru yerdeki harfleri (Yeşil) bul
+    for (let i = 0; i < 5; i++) {
+        let tileIndex = rowIndices[i];
+        let letter = guess[i];
+
+        if (letter === answer[i]) {
+            tiles[tileIndex].classList.add("correct");
+            colorKeyboard(letter, "#6aaa64");
+            answerLetters[i] = null; // Bu harfi tekrar kullanmamak için siliyoruz
+        }
+    }
+
+    // 2. Aşama: Yanlış yerdeki harfleri (Sarı) veya Olmayan harfleri (Gri) bul
+    for (let i = 0; i < 5; i++) {
+        let tileIndex = rowIndices[i];
+        let letter = guess[i];
+
+        // Eğer zaten doğru (yeşil) olarak işaretlenmediyse kontrol et
+        if (!tiles[tileIndex].classList.contains("correct")) {
+            let targetIndex = answerLetters.indexOf(letter);
+
+            if (targetIndex > -1) {
+                tiles[tileIndex].classList.add("present");
+                colorKeyboard(letter, "#c9b458");
+                answerLetters[targetIndex] = null;
+            } else {
+                tiles[tileIndex].classList.add("absent");
+                colorKeyboard(letter, "#3a3a3c");
+            }
+        }
+    }
+
+    // Kazanma Durumu
+    if (guess === answer) {
+        message.textContent = "Tebrikler! Kazandınız.";
+        gameOver = true;
+        newGameBtn.style.display = "block";
+        return;
+    }
+
+    // Kaybetme Durumu
+    row++;
+    col = 0;
+
+    if (row === 6) {
+        message.textContent = `Kaybettiniz! Cevap: ${answer}`;
+        gameOver = true;
+        newGameBtn.style.display = "block";
+    }
+}
+
+// Klavyedeki sanal butonların renklerini güncelleyen fonksiyon
+function colorKeyboard(letter, color) {
+    const keys = document.querySelectorAll(".key");
+    keys.forEach(keyBtn => {
+        if (keyBtn.textContent.toLocaleUpperCase("tr-TR") === letter) {
+            let currentBg = window.getComputedStyle(keyBtn).backgroundColor;
+            
+            // Eğer tuş zaten yeşilse rengini sarı ya da gri yapma
+            if (currentBg === "rgb(106, 170, 100)") return; 
+            // Eğer tuş zaten sarıysa rengini gri yapma
+            if (currentBg === "rgb(201, 180, 88)" && color === "#3a3a3c") return;
+
+            keyBtn.style.backgroundColor = color;
+        }
+    });
+}
+
+// Yeni Oyun buton tıklama dinleyicisi
+newGameBtn.addEventListener("click", initGame);
+
+// Oyunu ilk kez başlat
+initGame();
 </script>
+
+</body>
+</html>
