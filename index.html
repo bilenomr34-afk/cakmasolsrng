@@ -203,26 +203,28 @@
                 .replace(/ı/g, "I")
                 .toUpperCase();
         }
-    async function kelimeleriYukle() {
-    // Statik ve her zaman en güncel sürümü çeken doğru link:
-    const KELIME_LINKI = "https://gist.githubusercontent.com/bilenomr34-afk/6388bbc8e7def58d9cd286362a8cd273/raw/2a791776621fc3515a366c4654d80380a4d45550/kelimeler.json";
-    
-    try {
-        // Tarayıcının eski listeyi önbelleğe (cache) almaması için cache: "no-store" ekledik
-        const response = await fetch(KELIME_LINKI, { cache: "no-store" });
-        if (!response.ok) throw new Error("Dosya çekilemedi");
-        
-        KELIMELER = await response.json();
-        message.textContent = ""; 
-        initGame(); 
-    } catch (error) {
-        console.error("Yedek liste devreye giriyor:", error);
-        KELIMELER = ["SABAH", "SABIR", "SABUN", "SAÇAK", "SALÇA", "DENİZ", "DURUM", "DOLAR"];
-        message.textContent = "Yerel liste yüklendi.";
-        setTimeout(() => message.textContent = "", 2000);
-        initGame();
-    }
-}
+
+        async function kelimeleriYukle() {
+            // DÜZELTİLEN YER: Statik, revizyon numarası içermeyen ve daima en güncel sürümü çeken link!
+            const KELIME_LINKI = "https://gist.githubusercontent.com/bilenomr34-afk/6388bbc8e7def58d9cd286362a8cd273/raw/kelimeler.json";
+            
+            try {
+                // cache: "no-store" sayesinde tarayıcı her açılışta güncel listeyi zorla çeker
+                const response = await fetch(KELIME_LINKI, { cache: "no-store" });
+                if (!response.ok) throw new Error("Dosya çekilemedi");
+                
+                KELIMELER = await response.json();
+                message.textContent = ""; 
+                initGame(); 
+            } catch (error) {
+                console.error("Yedek liste devreye giriyor:", error);
+                KELIMELER = ["SABAH", "SABIR", "SABUN", "SAÇAK", "SALÇA", "DENİZ", "DURUM", "DOLAR"];
+                message.textContent = "Yerel liste yüklendi.";
+                setTimeout(() => message.textContent = "", 2000);
+                initGame();
+            }
+        }
+
         function initGame() {
             // Gist'ten gelen tüm kelimeleri Türkçe kuralıyla büyük harfe eşitliyoruz
             KELIMELER = KELIMELER.map(k => turkceBuyukHarf(k));
@@ -284,7 +286,7 @@
             else if (/^[A-ZĞÜŞİÖÇIıi]$/i.test(key)) { 
                 if (currentCol < COL_COUNT) {
                     const tile = document.getElementById(`tile-${currentRow}-${currentCol}`);
-                    const upperKey = turkceBuyukHarf(key); // Türkçe karakter güvenli büyütme
+                    const upperKey = turkceBuyukHarf(key); 
                     tile.textContent = upperKey;
                     tile.setAttribute("data-state", "tiled");
                     currentCol++;
