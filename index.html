@@ -177,11 +177,10 @@
     </div>
 
     <script>
-        // --- DEĞİŞKENLER VE AYARLAR ---
         const ROW_COUNT = 6;
         const COL_COUNT = 5;
         
-        let KELIMELER = []; // GitHub'dan gelecek dinamik liste
+        let KELIMELER = []; 
         let secretWord = "";
         let currentRow = 0;
         let currentCol = 0;
@@ -191,30 +190,32 @@
         const keyboard = document.getElementById("keyboard");
         const message = document.getElementById("message");
 
-        // Klavye tuş dizilimi (Türkçe Karakter Uyumlu)
         const KEYBOARD_LAYOUT = [
             ["E", "R", "T", "Y", "U", "I", "O", "P", "Ğ", "Ü"],
             ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ş", "İ"],
             ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "Ö", "Ç", "SİL"]
         ];
 
-        // --- 1. ADIM: İNTERNETTEN KELİMELERİ ÇEKME (YENİ EKSELER) ---
+        // Türkçe karakter güvenli büyük harf yapma fonksiyonu
+        function turkceBuyukHarf(metin) {
+            return metin
+                .replace(/i/g, "İ")
+                .replace(/ı/g, "I")
+                .toUpperCase();
+        }
+
         async function kelimeleriYukle() {
-            // Senin oluşturduğun GitHub Gist RAW linki
-            const KELIME_LINKI = "https://gist.github.com/bilenomr34-afk/6388bbc8e7def58d9cd286362a8cd273";
+            const KELIME_LINKI = "https://gist.githubusercontent.com/bilenomr34-afk/6388bbc8e7def58d9cd286362a8cd273/raw/kelimeler.json";
             
             try {
                 const response = await fetch(KELIME_LINKI);
                 if (!response.ok) throw new Error("Dosya çekilemedi");
                 
-                // JSON listesini diziye dönüştür
                 KELIMELER = await response.json();
-                
-                message.textContent = ""; // "Yükleniyor" yazısını kaldır
-                initGame(); // Oyunu başlat
+                message.textContent = ""; 
+                initGame(); 
             } catch (error) {
-                console.error("Kelime listesi yüklenemedi, yedek liste devreye giriyor:", error);
-                // İnternet kesintisi veya hata durumunda oyunun çökmemesi için acil durum listesi
+                console.error("Yedek liste devreye giriyor:", error);
                 KELIMELER = ["SABAH", "SABIR", "SABUN", "SAÇAK", "SALÇA", "DENİZ", "DURUM", "DOLAR"];
                 message.textContent = "Yerel liste yüklendi.";
                 setTimeout(() => message.textContent = "", 2000);
@@ -222,16 +223,13 @@
             }
         }
 
-        // --- 2. ADIM: OYUN ALANINI HAZIRLAMA ---
         function initGame() {
-            // Gist'ten gelen kelimeleri Türkçe kuralına göre kalıcı olarak BÜYÜK harfe çeviriyoruz
-            KELIMELER = KELIMELER.map(k => k.toUpperCase("tr-TR"));
+            // Gist'ten gelen tüm kelimeleri Türkçe kuralıyla büyük harfe eşitliyoruz
+            KELIMELER = KELIMELER.map(k => turkceBuyukHarf(k));
 
-            // Rastgele gizli kelime seçimi
             secretWord = KELIMELER[Math.floor(Math.random() * KELIMELER.length)];
-            console.log("Hile Gözcücü (Kelime):", secretWord); // Geliştirici konsolunda görmen için
+            console.log("Hile Gözcücü (Kelime):", secretWord); 
 
-            // Tabloyu Oluştur (Grid Odaları)
             board.innerHTML = "";
             for (let r = 0; r < ROW_COUNT; r++) {
                 const rowDiv = document.createElement("div");
@@ -245,12 +243,11 @@
                 board.appendChild(rowDiv);
             }
 
-            // Klavyeyi Oluştur
             keyboard.innerHTML = "";
             KEYBOARD_LAYOUT.forEach(row => {
                 const rowDiv = document.createElement("div");
                 rowDiv.className = "keyboard-row";
-                row => row.forEach(keyText => {
+                row.forEach(keyText => {
                     const button = document.createElement("button");
                     button.textContent = keyText;
                     button.className = "key";
@@ -265,7 +262,6 @@
             });
         }
 
-        // --- 3. ADIM: GİRDİ YÖNETİMİ ---
         function handleInput(key) {
             if (gameOver) return;
 
@@ -285,10 +281,10 @@
                     showMessage("Kelimeyi tamamlayın!");
                 }
             } 
-            else if (/^[A-ZĞÜŞİÖÇI]$/i.test(key)) { // Sadece harfleri kabul et
+            else if (/^[A-ZĞÜŞİÖÇIıi]$/i.test(key)) { 
                 if (currentCol < COL_COUNT) {
                     const tile = document.getElementById(`tile-${currentRow}-${currentCol}`);
-                    const upperKey = key.toUpperCase("tr-TR");
+                    const upperKey = turkceBuyukHarf(key); // Türkçe karakter güvenli büyütme
                     tile.textContent = upperKey;
                     tile.setAttribute("data-state", "tiled");
                     currentCol++;
@@ -296,21 +292,24 @@
             }
         }
 
-        // Klavye dinleyicisi (Bilgisayardan oynayanlar için)
         document.addEventListener("keydown", (e) => {
-            let key = e.key.toUpperCase("tr-TR");
-            if (key === "BACKSPACE") key = "SİL";
-            handleInput(key);
+            let key = e.key;
+            if (key === "Backspace") {
+                handleInput("SİL");
+            } else if (key === "Enter") {
+                handleInput("ENTER");
+            } else {
+                handleInput(key);
+            }
         });
 
-        // --- 4. ADIM: KELİME KONTROLÜ VE RENKLENDİRME ---
         function checkRow() {
             let guess = "";
             for (let c = 0; c < COL_COUNT; c++) {
                 guess += document.getElementById(`tile-${currentRow}-${c}`).textContent;
             }
 
-            // Gist listenizde bu kelime var mı kontrolü
+            // Gist listenizle karşılaştırma
             if (!KELIMELER.includes(guess)) {
                 showMessage("Sözlükte bulunamadı!");
                 return;
@@ -319,7 +318,6 @@
             let secretLetters = secretWord.split("");
             let rowStates = Array(COL_COUNT).fill("absent");
 
-            // 1. Tur: Tam doğru (Yeşil) olanları bulma
             for (let c = 0; c < COL_COUNT; c++) {
                 if (guess[c] === secretWord[c]) {
                     rowStates[c] = "correct";
@@ -327,7 +325,6 @@
                 }
             }
 
-            // 2. Tur: Yeri yanlış ama kelimede var (Sarı) olanları bulma
             for (let c = 0; c < COL_COUNT; c++) {
                 if (rowStates[c] === "correct") continue;
 
@@ -338,7 +335,6 @@
                 }
             }
 
-            // Arayüzü ve Klavyeyi Renklendirme
             for (let c = 0; c < COL_COUNT; c++) {
                 const tile = document.getElementById(`tile-${currentRow}-${c}`);
                 const letter = guess[c];
@@ -348,7 +344,6 @@
                 updateKeyboard(letter, state);
             }
 
-            // Kazanma / Kaybetme Durumları
             if (guess === secretWord) {
                 showMessage("Tebrikler! Kazandınız! 🎉");
                 gameOver = true;
@@ -361,7 +356,6 @@
                 return;
             }
 
-            // Sonraki satıra geçiş
             currentRow++;
             currentCol = 0;
         }
@@ -371,7 +365,6 @@
             if (!keyBtn) return;
 
             const currentState = keyBtn.getAttribute("data-state");
-            // Yeşili sarı ya da gri ile ezmemek için öncelik kontrolü yapıyoruz
             if (currentState === "correct") return;
             if (currentState === "present" && state === "absent") return;
 
@@ -382,7 +375,6 @@
             message.textContent = text;
         }
 
-        // --- SİSTEMİ TETİKLEYEN BAŞLANGIÇ NOKTASI ---
         kelimeleriYukle();
     </script>
 </body>
