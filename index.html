@@ -10,7 +10,20 @@
             --color-present: #c9b458;
             --color-absent: #787c7e;
             --color-border: #d3d6da;
+            --background-color: #fafafa;
             --color-text: #1a1a1a;
+            --tile-bg: white;
+            --key-bg: #e4e6eb;
+            --key-active: #ccc;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #121213;
+            --color-text: #f8f8f8;
+            --color-border: #3a3a3c;
+            --tile-bg: #121213;
+            --key-bg: #818384;
+            --key-active: #565758;
         }
 
         body {
@@ -18,35 +31,77 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #fafafa;
+            background-color: var(--background-color);
             color: var(--color-text);
             margin: 0;
             padding: 20px;
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         header {
             border-bottom: 1px solid var(--color-border);
             width: 100%;
             max-width: 500px;
-            text-align: center;
-            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
             letter-spacing: 2px;
             margin: 10px 0;
+        }
+
+        .theme-btn {
+            background: none;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
         }
 
         #game-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             max-width: 500px;
             width: 100%;
+        }
+
+        #message-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-height: 75px;
+        }
+
+        #message {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #e04040;
+            text-align: center;
+        }
+
+        .action-btn {
+            background-color: var(--color-correct);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         #board {
@@ -75,7 +130,8 @@
             text-transform: uppercase;
             user-select: none;
             transition: all 0.2s ease;
-            background-color: white;
+            background-color: var(--tile-bg);
+            color: var(--color-text);
         }
 
         .tile[data-state="tiled"] {
@@ -116,10 +172,11 @@
         }
 
         .key {
-            background-color: #e4e6eb;
+            background-color: var(--key-bg);
+            color: var(--color-text);
             border: 0;
             border-radius: 4px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             height: 58px;
             cursor: pointer;
@@ -128,7 +185,7 @@
             justify-content: center;
             align-items: center;
             flex: 1;
-            transition: background-color 0.1s ease;
+            transition: background-color 0.1s ease, color 0.1s ease;
         }
 
         .key.wide {
@@ -137,7 +194,7 @@
         }
 
         .key:active {
-            background-color: #ccc;
+            background-color: var(--key-active);
         }
 
         .key[data-state="correct"] {
@@ -154,24 +211,20 @@
             background-color: var(--color-absent);
             color: white;
         }
-
-        #message {
-            height: 30px;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #e04040;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
 
     <header>
         <h1>WORDLE</h1>
+        <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">🌙 Karanlık</button>
     </header>
 
     <div id="game-container">
-        <div id="message">Yükleniyor...</div>
+        <div id="message-area">
+            <div id="message">Yükleniyor...</div>
+            <button class="action-btn" id="new-game-btn" onclick="startNewGame()">Yeni Oyun ↻</button>
+        </div>
         <div id="board"></div>
         <div id="keyboard"></div>
     </div>
@@ -189,6 +242,7 @@
         const board = document.getElementById("board");
         const keyboard = document.getElementById("keyboard");
         const message = document.getElementById("message");
+        const newGameBtn = document.getElementById("new-game-btn");
 
         const KEYBOARD_LAYOUT = [
             ["E", "R", "T", "Y", "U", "I", "O", "P", "Ğ", "Ü"],
@@ -196,7 +250,6 @@
             ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "Ö", "Ç", "SİL"]
         ];
 
-        // Türkçe karakter güvenli büyük harf yapma fonksiyonu
         function turkceBuyukHarf(metin) {
             return metin
                 .replace(/i/g, "İ")
@@ -204,16 +257,29 @@
                 .toUpperCase();
         }
 
+        // Karanlık Mod Geçiş Fonksiyonu
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute("data-theme");
+            const toggleBtn = document.getElementById("theme-toggle");
+            
+            if (currentTheme === "dark") {
+                document.documentElement.removeAttribute("data-theme");
+                toggleBtn.textContent = "🌙 Karanlık";
+            } else {
+                document.documentElement.setAttribute("data-theme", "dark");
+                toggleBtn.textContent = "☀️ Aydınlık";
+            }
+        }
+
         async function kelimeleriYukle() {
-            // DÜZELTİLEN YER: Statik, revizyon numarası içermeyen ve daima en güncel sürümü çeken link!
             const KELIME_LINKI = "https://gist.githubusercontent.com/bilenomr34-afk/6388bbc8e7def58d9cd286362a8cd273/raw/kelimeler.json";
             
             try {
-                // cache: "no-store" sayesinde tarayıcı her açılışta güncel listeyi zorla çeker
                 const response = await fetch(KELIME_LINKI, { cache: "no-store" });
                 if (!response.ok) throw new Error("Dosya çekilemedi");
                 
                 KELIMELER = await response.json();
+                KELIMELER = KELIMELER.map(k => turkceBuyukHarf(k));
                 message.textContent = ""; 
                 initGame(); 
             } catch (error) {
@@ -226,12 +292,16 @@
         }
 
         function initGame() {
-            // Gist'ten gelen tüm kelimeleri Türkçe kuralıyla büyük harfe eşitliyoruz
-            KELIMELER = KELIMELER.map(k => turkceBuyukHarf(k));
+            gameOver = false;
+            currentRow = 0;
+            currentCol = 0;
+            newGameBtn.style.display = "none";
+            message.textContent = "";
 
             secretWord = KELIMELER[Math.floor(Math.random() * KELIMELER.length)];
             console.log("Hile Gözcücü (Kelime):", secretWord); 
 
+            // Matrisi Oluştur
             board.innerHTML = "";
             for (let r = 0; r < ROW_COUNT; r++) {
                 const rowDiv = document.createElement("div");
@@ -245,6 +315,7 @@
                 board.appendChild(rowDiv);
             }
 
+            // Klavyeyi Oluştur
             keyboard.innerHTML = "";
             KEYBOARD_LAYOUT.forEach(row => {
                 const rowDiv = document.createElement("div");
@@ -262,6 +333,11 @@
                 });
                 keyboard.appendChild(rowDiv);
             });
+        }
+
+        // Yeni oyunu tetikleyen buton fonksiyonu
+        function startNewGame() {
+            initGame();
         }
 
         function handleInput(key) {
@@ -311,7 +387,6 @@
                 guess += document.getElementById(`tile-${currentRow}-${c}`).textContent;
             }
 
-            // Gist listenizle karşılaştırma
             if (!KELIMELER.includes(guess)) {
                 showMessage("Sözlükte bulunamadı!");
                 return;
@@ -349,12 +424,14 @@
             if (guess === secretWord) {
                 showMessage("Tebrikler! Kazandınız! 🎉");
                 gameOver = true;
+                newGameBtn.style.display = "block"; // Yeni oyun butonu gösterilir
                 return;
             }
 
             if (currentRow === ROW_COUNT - 1) {
                 showMessage(`Kaybettiniz! Kelime: ${secretWord}`);
                 gameOver = true;
+                newGameBtn.style.display = "block"; // Yeni oyun butonu gösterilir
                 return;
             }
 
