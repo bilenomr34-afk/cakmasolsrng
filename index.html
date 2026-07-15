@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wordle Türkçe</title>
+    <title>Wordle Türkçe - 💜</title>
     <style>
         :root {
             --color-correct: #6aaa64;
@@ -15,6 +15,7 @@
             --tile-bg: white;
             --key-bg: #e4e6eb;
             --key-active: #ccc;
+            --border-radius: 4px;
         }
 
         [data-theme="dark"] {
@@ -26,17 +27,25 @@
             --key-active: #565758;
         }
 
-        /* "DENİZ" yazıldığında aktif olacak özel pembe tema */
-        [data-theme="pink"] {
-            --background-color: #ffeef2;
-            --color-text: #63001c;
-            --color-border: #ffb3c6;
-            --tile-bg: #fff;
-            --key-bg: #ffcad4;
-            --key-active: #ffb3c6;
-            --color-correct: #ff4d6d;
-            --color-present: #ff85a1;
-            --color-absent: #c97a8e;
+        /* 💜 "DENİZ" yazıldığında aktif olacak Kalpli & Pofuduk Mor Tema 💜 */
+        [data-theme="cute-purple"] {
+            --background-color: #fbf7ff;
+            --color-text: #5b21b6; /* Koyu mor yazı */
+            --color-border: #e9d5ff; /* Açık mor çerçeveler */
+            --tile-bg: #ffffff;
+            --key-bg: #f3e8ff; /* Pofuduk mor tuşlar */
+            --key-active: #d8b4fe;
+            --color-correct: #a855f7; /* Canlı Mor */
+            --color-present: #f472b6; /* Şirin Pembe */
+            --color-absent: #cbd5e1;
+            --border-radius: 16px; /* Kutuları pofuduk yuvarlak yapar */
+        }
+
+        /* Mor tema aktifken arka plana sevimli benekler ekleyelim */
+        [data-theme="cute-purple"] body {
+            background-image: radial-gradient(#f3e8ff 20%, transparent 20%), radial-gradient(#f5f3ff 20%, transparent 20%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
         }
 
         body {
@@ -74,10 +83,11 @@
             border: 1px solid var(--color-border);
             color: var(--color-text);
             padding: 8px 12px;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             font-size: 0.9rem;
+            transition: all 0.2s;
         }
 
         #game-container {
@@ -100,7 +110,7 @@
         #message {
             font-weight: bold;
             font-size: 1.2rem;
-            color: #e04040;
+            color: #db2777; /* Tatlı pembe/kırmızı ton */
             text-align: center;
         }
 
@@ -111,10 +121,10 @@
             padding: 10px 20px;
             font-size: 1rem;
             font-weight: bold;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             display: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         #board {
@@ -134,7 +144,7 @@
 
         .tile {
             border: 2px solid var(--color-border);
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             display: inline-flex;
             justify-content: center;
             align-items: center;
@@ -142,13 +152,17 @@
             font-weight: bold;
             text-transform: uppercase;
             user-select: none;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             background-color: var(--tile-bg);
             color: var(--color-text);
         }
 
         .tile[data-state="tiled"] {
             border-color: #878a8c;
+        }
+
+        [data-theme="cute-purple"] .tile[data-state="tiled"] {
+            border-color: #c084fc; /* Mor modda yazılan harf çerçevesi */
         }
 
         .tile[data-state="correct"] {
@@ -188,7 +202,7 @@
             background-color: var(--key-bg);
             color: var(--color-text);
             border: 0;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             font-size: 1.1rem;
             font-weight: bold;
             height: 58px;
@@ -198,7 +212,7 @@
             justify-content: center;
             align-items: center;
             flex: 1;
-            transition: background-color 0.1s ease, color 0.1s ease;
+            transition: all 0.2s ease;
         }
 
         .key.wide {
@@ -229,7 +243,7 @@
 <body>
 
     <header>
-        <h1>WORDLE</h1>
+        <h1 id="logo">WORDLE</h1>
         <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">🌙 Karanlık</button>
     </header>
 
@@ -246,7 +260,6 @@
         const ROW_COUNT = 6;
         const COL_COUNT = 5;
         
-        // Kelimeler doğrudan koda gömüldü (İnternet bağlantısı/CORS sorunları yaşanmaması için)
         let KELIMELER = [
             "DENİZ", "SABAH", "SABIR", "SABUN", "SAÇAK", "SALÇA", "DURUM", "DOLAR", 
             "KALEM", "KAPAK", "KAVUN", "ÇİÇEK", "KİTAP", "BEYAZ", "SEVDA", "MASAL"
@@ -260,6 +273,7 @@
         const keyboard = document.getElementById("keyboard");
         const message = document.getElementById("message");
         const newGameBtn = document.getElementById("new-game-btn");
+        const logo = document.getElementById("logo");
 
         const KEYBOARD_LAYOUT = [
             ["E", "R", "T", "Y", "U", "I", "O", "P", "Ğ", "Ü"],
@@ -274,23 +288,26 @@
                 .toUpperCase();
         }
 
-        // Karanlık / Pembe / Aydınlık Mod Geçiş Fonksiyonu
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute("data-theme");
             const toggleBtn = document.getElementById("theme-toggle");
             
-            if (currentTheme === "pink") {
+            // Eğer tatlı mor tema aktifse, butona basıldığında karanlık moda döner
+            if (currentTheme === "cute-purple") {
                 document.documentElement.setAttribute("data-theme", "dark");
                 toggleBtn.textContent = "☀️ Aydınlık";
+                logo.textContent = "WORDLE";
                 return;
             }
 
             if (currentTheme === "dark") {
                 document.documentElement.removeAttribute("data-theme");
                 toggleBtn.textContent = "🌙 Karanlık";
+                logo.textContent = "WORDLE";
             } else {
                 document.documentElement.setAttribute("data-theme", "dark");
                 toggleBtn.textContent = "☀️ Aydınlık";
+                logo.textContent = "WORDLE";
             }
         }
 
@@ -301,10 +318,11 @@
             newGameBtn.style.display = "none";
             message.textContent = "";
 
-            // Yeni oyunda pembe moddan çıkış yap
-            if (document.documentElement.getAttribute("data-theme") === "pink") {
+            // Yeni oyunda eğer mor tema aktifse standart temaya sıfırlar
+            if (document.documentElement.getAttribute("data-theme") === "cute-purple") {
                 document.documentElement.removeAttribute("data-theme");
                 document.getElementById("theme-toggle").textContent = "🌙 Karanlık";
+                logo.textContent = "WORDLE";
             }
 
             secretWord = KELIMELER[Math.floor(Math.random() * KELIMELER.length)];
@@ -364,7 +382,7 @@
                 if (currentCol === COL_COUNT) {
                     checkRow();
                 } else {
-                    showMessage("Kelimeyi tamamlayın!");
+                    showMessage("Kelimeyi tamamlayın! 🥺");
                 }
             } 
             else if (/^[A-ZĞÜŞİÖÇIıi]$/i.test(key)) { 
@@ -396,14 +414,16 @@
             }
 
             if (!KELIMELER.includes(guess)) {
-                showMessage("Sözlükte bulunamadı!");
+                showMessage("Sözlükte bulunamadı! 😿");
                 return;
             }
 
-            // --- "DENİZ" YAZILDIĞINDA PEMBE TEMA YAPMA SÜRPRİZİ ---
+            // --- 💜 "DENİZ" YAZILDIĞINDA AKTİF OLAN SÜRPRİZ 💜 ---
             if (guess === "DENİZ") {
-                document.documentElement.setAttribute("data-theme", "pink");
-                document.getElementById("theme-toggle").textContent = "🌸 Pembe Mod";
+                document.documentElement.setAttribute("data-theme", "cute-purple");
+                document.getElementById("theme-toggle").textContent = "💜 Kalpli Mod";
+                logo.textContent = "🎀 WORDLE 💜";
+                showMessage("✨ Tatlış kalpli mod açıldı! ✨");
             }
             // ----------------------------------------------------
 
@@ -437,14 +457,14 @@
             }
 
             if (guess === secretWord) {
-                showMessage("Tebrikler! Kazandınız! 🎉");
+                showMessage("Tebrikler! Kazandınız! 🎉💜✨");
                 gameOver = true;
                 newGameBtn.style.display = "block"; 
                 return;
             }
 
             if (currentRow === ROW_COUNT - 1) {
-                showMessage(`Kaybettiniz! Kelime: ${secretWord}`);
+                showMessage(`Olsun, bir dahakine! Kelime: ${secretWord} 🥺`);
                 gameOver = true;
                 newGameBtn.style.display = "block"; 
                 return;
@@ -469,7 +489,6 @@
             message.textContent = text;
         }
 
-        // Oyunu doğrudan başlat
         initGame();
     </script>
 </body>
