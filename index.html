@@ -26,6 +26,19 @@
             --key-active: #565758;
         }
 
+        /* "DENİZ" yazıldığında aktif olacak özel pembe tema */
+        [data-theme="pink"] {
+            --background-color: #ffeef2;
+            --color-text: #63001c;
+            --color-border: #ffb3c6;
+            --tile-bg: #fff;
+            --key-bg: #ffcad4;
+            --key-active: #ffb3c6;
+            --color-correct: #ff4d6d;
+            --color-present: #ff85a1;
+            --color-absent: #c97a8e;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -262,6 +275,13 @@
             const currentTheme = document.documentElement.getAttribute("data-theme");
             const toggleBtn = document.getElementById("theme-toggle");
             
+            // Eğer pembe tema aktifse karanlık butonuna basıldığında pembe temayı kaldırıyoruz
+            if (currentTheme === "pink") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                toggleBtn.textContent = "☀️ Aydınlık";
+                return;
+            }
+
             if (currentTheme === "dark") {
                 document.documentElement.removeAttribute("data-theme");
                 toggleBtn.textContent = "🌙 Karanlık";
@@ -272,7 +292,8 @@
         }
 
         async function kelimeleriYukle() {
-            const KELIME_LINKI = "https://gist.github.com/bilenomr34-afk/6388bbc8e7def58d9cd286362a8cd273;
+            // URL düzeltildi (Sondaki açık kalan tırnak kapatıldı)
+            const KELIME_LINKI = "https://gist.github.com/bilenomr34-afk/6388bbc8e7def58d9cd286362a8cd273";
             
             try {
                 const response = await fetch(KELIME_LINKI, { cache: "no-store" });
@@ -297,6 +318,12 @@
             currentCol = 0;
             newGameBtn.style.display = "none";
             message.textContent = "";
+
+            // Yeni oyun başladığında eğer pembe tema aktifse sıradan temaya geri döndürür
+            if (document.documentElement.getAttribute("data-theme") === "pink") {
+                document.documentElement.removeAttribute("data-theme");
+                document.getElementById("theme-toggle").textContent = "🌙 Karanlık";
+            }
 
             secretWord = KELIMELER[Math.floor(Math.random() * KELIMELER.length)];
             console.log("Hile Gözcücü (Kelime):", secretWord); 
@@ -335,7 +362,6 @@
             });
         }
 
-        // Yeni oyunu tetikleyen buton fonksiyonu
         function startNewGame() {
             initGame();
         }
@@ -392,6 +418,13 @@
                 return;
             }
 
+            // --- PEMBE TEMA SÜRPRİZİ (EASTER EGG) ---
+            if (guess === "DENİZ") {
+                document.documentElement.setAttribute("data-theme", "pink");
+                document.getElementById("theme-toggle").textContent = "🌸 Pembe Mod";
+            }
+            // ----------------------------------------
+
             let secretLetters = secretWord.split("");
             let rowStates = Array(COL_COUNT).fill("absent");
 
@@ -424,14 +457,14 @@
             if (guess === secretWord) {
                 showMessage("Tebrikler! Kazandınız! 🎉");
                 gameOver = true;
-                newGameBtn.style.display = "block"; // Yeni oyun butonu gösterilir
+                newGameBtn.style.display = "block"; 
                 return;
             }
 
             if (currentRow === ROW_COUNT - 1) {
                 showMessage(`Kaybettiniz! Kelime: ${secretWord}`);
                 gameOver = true;
-                newGameBtn.style.display = "block"; // Yeni oyun butonu gösterilir
+                newGameBtn.style.display = "block"; 
                 return;
             }
 
