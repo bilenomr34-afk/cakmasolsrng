@@ -292,7 +292,6 @@
             const currentTheme = document.documentElement.getAttribute("data-theme");
             const toggleBtn = document.getElementById("theme-toggle");
             
-            // Eğer tatlı mor tema aktifse, butona basıldığında karanlık moda döner
             if (currentTheme === "cute-purple") {
                 document.documentElement.setAttribute("data-theme", "dark");
                 toggleBtn.textContent = "☀️ Aydınlık";
@@ -318,7 +317,6 @@
             newGameBtn.style.display = "none";
             message.textContent = "";
 
-            // Yeni oyunda eğer mor tema aktifse standart temaya sıfırlar
             if (document.documentElement.getAttribute("data-theme") === "cute-purple") {
                 document.documentElement.removeAttribute("data-theme");
                 document.getElementById("theme-toggle").textContent = "🌙 Karanlık";
@@ -418,14 +416,16 @@
                 return;
             }
 
-            // --- 💜 "DENİZ" YAZILDIĞINDA AKTİF OLAN SÜRPRİZ 💜 ---
-            if (guess === "DENİZ") {
+            // --- 💜 "DENİZ" KONTROLÜ (GÜVENLİ VE GARANTİ SÜRÜM) 💜 ---
+            // Harflerin kodlamasından (İ/I uyuşmazlığı) kaçınmak için tüm varyasyonları standartlaştırıyoruz.
+            const safeGuess = guess.replace(/İ/g, "I").replace(/ı/g, "I").replace(/i/g, "I").toUpperCase();
+            if (safeGuess === "DENIZ") {
                 document.documentElement.setAttribute("data-theme", "cute-purple");
                 document.getElementById("theme-toggle").textContent = "💜 Kalpli Mod";
                 logo.textContent = "🎀 WORDLE 💜";
                 showMessage("✨ Tatlış kalpli mod açıldı! ✨");
             }
-            // ----------------------------------------------------
+            // --------------------------------------------------------
 
             let secretLetters = secretWord.split("");
             let rowStates = Array(COL_COUNT).fill("absent");
