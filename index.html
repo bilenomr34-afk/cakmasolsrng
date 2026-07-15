@@ -288,6 +288,16 @@
                 .toUpperCase();
         }
 
+        function cleanTextForCheck(text) {
+            // Türkçe karakterleri tamamen standartlaştırarak kontrol hatalarını sıfırlıyoruz.
+            return text
+                .replace(/İ/g, "I")
+                .replace(/ı/g, "I")
+                .replace(/i/g, "I")
+                .toUpperCase()
+                .trim();
+        }
+
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute("data-theme");
             const toggleBtn = document.getElementById("theme-toggle");
@@ -411,19 +421,20 @@
                 guess += document.getElementById(`tile-${currentRow}-${c}`).textContent;
             }
 
-            if (!KELIMELER.includes(guess)) {
-                showMessage("Sözlükte bulunamadı! 😿");
-                return;
-            }
-
-            // --- 💜 "DENİZ" KONTROLÜ (GÜVENLİ VE GARANTİ SÜRÜM) 💜 ---
-            // Harflerin kodlamasından (İ/I uyuşmazlığı) kaçınmak için tüm varyasyonları standartlaştırıyoruz.
-            const safeGuess = guess.replace(/İ/g, "I").replace(/ı/g, "I").replace(/i/g, "I").toUpperCase();
-            if (safeGuess === "DENIZ") {
+            // --- 💜 ÖNCELİKLİ "DENİZ" SÜRPRİZ KONTROLÜ 💜 ---
+            // Sözlük kontrolünden önce mor tema kontrolünü yaparak tüm takılmaları önlüyoruz.
+            const cleanGuess = cleanTextForCheck(guess);
+            if (cleanGuess === "DENIZ") {
                 document.documentElement.setAttribute("data-theme", "cute-purple");
                 document.getElementById("theme-toggle").textContent = "💜 Kalpli Mod";
                 logo.textContent = "🎀 WORDLE 💜";
                 showMessage("✨ Tatlış kalpli mod açıldı! ✨");
+            } else {
+                // Eğer yazılan kelime DENİZ değilse normal sözlük kontrolünü yapmaya devam et
+                if (!KELIMELER.includes(guess)) {
+                    showMessage("Sözlükte bulunamadı! 😿");
+                    return;
+                }
             }
             // --------------------------------------------------------
 
