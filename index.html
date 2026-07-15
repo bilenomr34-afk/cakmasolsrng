@@ -246,7 +246,11 @@
         const ROW_COUNT = 6;
         const COL_COUNT = 5;
         
-        let KELIMELER = []; 
+        // Kelimeler doğrudan koda gömüldü (İnternet bağlantısı/CORS sorunları yaşanmaması için)
+        let KELIMELER = [
+            "DENİZ", "SABAH", "SABIR", "SABUN", "SAÇAK", "SALÇA", "DURUM", "DOLAR", 
+            "KALEM", "KAPAK", "KAVUN", "ÇİÇEK", "KİTAP", "BEYAZ", "SEVDA", "MASAL"
+        ]; 
         let secretWord = "";
         let currentRow = 0;
         let currentCol = 0;
@@ -270,12 +274,11 @@
                 .toUpperCase();
         }
 
-        // Karanlık Mod Geçiş Fonksiyonu
+        // Karanlık / Pembe / Aydınlık Mod Geçiş Fonksiyonu
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute("data-theme");
             const toggleBtn = document.getElementById("theme-toggle");
             
-            // Eğer pembe tema aktifse karanlık butonuna basıldığında pembe temayı kaldırıyoruz
             if (currentTheme === "pink") {
                 document.documentElement.setAttribute("data-theme", "dark");
                 toggleBtn.textContent = "☀️ Aydınlık";
@@ -291,27 +294,6 @@
             }
         }
 
-        async function kelimeleriYukle() {
-            // URL düzeltildi (Sondaki açık kalan tırnak kapatıldı)
-            const KELIME_LINKI = "https://gist.github.com/bilenomr34-afk/6388bbc8e7def58d9cd286362a8cd273";
-            
-            try {
-                const response = await fetch(KELIME_LINKI, { cache: "no-store" });
-                if (!response.ok) throw new Error("Dosya çekilemedi");
-                
-                KELIMELER = await response.json();
-                KELIMELER = KELIMELER.map(k => turkceBuyukHarf(k));
-                message.textContent = ""; 
-                initGame(); 
-            } catch (error) {
-                console.error("Yedek liste devreye giriyor:", error);
-                KELIMELER = ["SABAH", "SABIR", "SABUN", "SAÇAK", "SALÇA", "DENİZ", "DURUM", "DOLAR"];
-                message.textContent = "Yerel liste yüklendi.";
-                setTimeout(() => message.textContent = "", 2000);
-                initGame();
-            }
-        }
-
         function initGame() {
             gameOver = false;
             currentRow = 0;
@@ -319,7 +301,7 @@
             newGameBtn.style.display = "none";
             message.textContent = "";
 
-            // Yeni oyun başladığında eğer pembe tema aktifse sıradan temaya geri döndürür
+            // Yeni oyunda pembe moddan çıkış yap
             if (document.documentElement.getAttribute("data-theme") === "pink") {
                 document.documentElement.removeAttribute("data-theme");
                 document.getElementById("theme-toggle").textContent = "🌙 Karanlık";
@@ -418,12 +400,12 @@
                 return;
             }
 
-            // --- PEMBE TEMA SÜRPRİZİ (EASTER EGG) ---
+            // --- "DENİZ" YAZILDIĞINDA PEMBE TEMA YAPMA SÜRPRİZİ ---
             if (guess === "DENİZ") {
                 document.documentElement.setAttribute("data-theme", "pink");
                 document.getElementById("theme-toggle").textContent = "🌸 Pembe Mod";
             }
-            // ----------------------------------------
+            // ----------------------------------------------------
 
             let secretLetters = secretWord.split("");
             let rowStates = Array(COL_COUNT).fill("absent");
@@ -487,7 +469,8 @@
             message.textContent = text;
         }
 
-        kelimeleriYukle();
+        // Oyunu doğrudan başlat
+        initGame();
     </script>
 </body>
 </html>
